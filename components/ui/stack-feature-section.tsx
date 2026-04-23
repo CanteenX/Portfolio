@@ -56,8 +56,8 @@ export default function FeatureSection() {
       <style dangerouslySetInnerHTML={{ __html: ORBIT_STYLES }} />
 
       {/* Left side: Heading and Text */}
-      <div className="w-1/2 z-10">
-        <h1 className="text-4xl sm:text-6xl font-bold mb-4 text-white">
+      <div className="w-1/2 z-10 text-left">
+        <h1 className="mb-4 text-white">
           Build your idea
         </h1>
         <p className="text-gray-300 mb-6 max-w-lg">

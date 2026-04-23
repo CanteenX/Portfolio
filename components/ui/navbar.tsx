@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 export function Navbar() {
@@ -12,16 +13,22 @@ export function Navbar() {
         <div className="flex items-center justify-between">
 
           {/* Logo */}
-          <a href="/" className="text-lg font-bold text-white tracking-tight hover:text-gray-300 transition-colors">
-            TechCo
+          <a href="/" className="font-mono font-medium tracking-tighter text-sm flex items-center gap-2 text-white">
+            <div className="size-2.5 bg-mint inline-block" aria-hidden />
+            <span>FORGE_COLLECTIVE</span>
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
-            <NavLink href="/work" label="Work" />
-            <NavLink href="/projects" label="Projects" />
-            <NavLink href="#services" label="Services" />
-            <NavLink href="/contact" label="Let's Talk" />
+          <div className="hidden md:flex items-center gap-8 text-mono-tag">
+            <NavLink href="/projects" label="Work" />
+            <NavLink href="/how-we-work" label="Process" />
+            <NavLink href="/team" label="Team" />
+            <Link
+              href="/contact"
+              className="bg-white text-black px-4 py-2 hover:bg-mint transition-colors"
+            >
+              Let's Talk
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -44,9 +51,9 @@ export function Navbar() {
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-zinc-800/95 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
             <div className="flex flex-col py-4 px-6 space-y-2">
-              <MobileNavLink href="/work" label="Work" onClick={() => setMobileMenuOpen(false)} />
-              <MobileNavLink href="/projects" label="Projects" onClick={() => setMobileMenuOpen(false)} />
-              <MobileNavLink href="#services" label="Services" onClick={() => setMobileMenuOpen(false)} />
+              <MobileNavLink href="/projects" label="Work" onClick={() => setMobileMenuOpen(false)} />
+              <MobileNavLink href="/how-we-work" label="Process" onClick={() => setMobileMenuOpen(false)} />
+              <MobileNavLink href="/team" label="Team" onClick={() => setMobileMenuOpen(false)} />
               <MobileNavLink href="/contact" label="Let's Talk" onClick={() => setMobileMenuOpen(false)} />
             </div>
           </div>
@@ -60,11 +67,9 @@ function NavLink({ href, label }: { href: string; label: string }) {
   return (
     <a
       href={href}
-      className="group relative px-4 py-2 text-sm font-medium text-gray-200 hover:text-white transition-all duration-200 rounded-full hover:bg-white/5"
+      className="text-zinc-500 hover:text-white transition-colors"
     >
-      <span className="flex items-center gap-1.5">
-        {label}
-      </span>
+      {label}
     </a>
   );
 }

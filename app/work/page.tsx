@@ -6,6 +6,7 @@ import { Footer } from "@/components/ui/footer";
 import { PROJECTS } from "@/lib/projects";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { ContactCTA } from "@/components/ui/contact-cta";
 import Link from "next/link";
 
 const FILTERS = ["All", "Native Mobile", "Web Apps", "Backend/Cloud"] as const;
@@ -94,6 +95,7 @@ export default function WorkPage() {
           </div>
         </div>
         
+        <ContactCTA />
         <Footer />
       </main>
     </SmoothScroll>

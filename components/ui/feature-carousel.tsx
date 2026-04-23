@@ -190,8 +190,8 @@ export function FeatureCarousel() {
   return (
     <div className="w-full max-w-7xl mx-auto px-4 md:p-8">
       <div className="relative rounded-2xl md:rounded-[2.5rem] lg:rounded-[4rem] flex flex-col lg:flex-row lg:aspect-video border border-white/10 overflow-hidden">
-        {/* Left Sidebar - Glassmorphism */}
-        <div className="w-full lg:w-[40%] min-h-[22rem] md:min-h-[26rem] lg:h-full relative z-30 flex flex-col items-start justify-center overflow-hidden px-4 md:px-16 lg:pl-16 bg-zinc-900/50 backdrop-blur-2xl">
+        {/* Left Sidebar - Optimized Glassmorphism */}
+        <div className="w-full lg:w-[40%] min-h-[22rem] md:min-h-[26rem] lg:h-full relative z-30 flex flex-col items-start justify-center overflow-hidden px-4 md:px-16 lg:pl-16 bg-zinc-900/60 backdrop-blur-xl">
           {/* Gradient Overlays */}
           <div className="absolute inset-x-0 top-0 h-12 md:h-20 lg:h-16 bg-linear-to-b from-zinc-900/80 via-zinc-900/50 to-transparent z-40" />
           <div className="absolute inset-x-0 bottom-0 h-12 md:h-20 lg:h-16 bg-linear-to-t from-zinc-900/80 via-zinc-900/50 to-transparent z-40" />
@@ -215,10 +215,11 @@ export function FeatureCarousel() {
                   style={{
                     height: itemHeight,
                     width: "fit-content",
+                    willChange: "transform, opacity",
                   }}
                   animate={{
                     y: wrappedDistance * itemHeight,
-                    opacity: 1 - Math.abs(wrappedDistance) * 0.25,
+                    opacity: 1 - Math.min(Math.abs(wrappedDistance) * 0.35, 0.8),
                   }}
                   transition={{
                     type: "spring",
@@ -285,6 +286,7 @@ export function FeatureCarousel() {
                 <motion.div
                   key={feature.id}
                   initial={false}
+                  style={{ willChange: "transform, opacity" }}
                   animate={{
                     x: isActive ? 0 : isPrev ? -100 : isNext ? 100 : 0,
                     scale: isActive ? 1 : isPrev || isNext ? 0.85 : 0.7,

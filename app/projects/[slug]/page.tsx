@@ -7,7 +7,7 @@ import { Footer } from "@/components/ui/footer";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ArrowLeft, CheckCircle2, Code2, Cpu, Globe, Layers, Zap } from "lucide-react";
-import { motion } from "framer-motion";
+import { ContactCTA } from "@/components/ui/contact-cta";
 
 export default function ProjectDetailsPage() {
   const { slug } = useParams();
@@ -233,20 +233,7 @@ export default function ProjectDetailsPage() {
         </section>
 
         {/* CTA */}
-        <section className="py-32 px-4 border-t border-white/5">
-          <div className="max-w-4xl mx-auto text-center">
-            <ScrollReveal direction="up">
-              <h2 className="text-5xl md:text-7xl font-bold mb-12 tracking-tight">Need engineering like this?</h2>
-              <a 
-                href="/contact" 
-                className="inline-flex items-center gap-4 px-12 py-6 bg-emerald-500 text-black rounded-full font-bold text-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)]"
-              >
-                Let's Talk
-                <ArrowLeft className="w-6 h-6 rotate-180" />
-              </a>
-            </ScrollReveal>
-          </div>
-        </section>
+        <ContactCTA />
 
         <Footer />
       </main>

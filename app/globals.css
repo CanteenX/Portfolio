@@ -19,6 +19,11 @@
   --tracking-wide: calc(var(--tracking-normal) + 0.025em);
   --tracking-wider: calc(var(--tracking-normal) + 0.05em);
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
+
+  /* Brand semantic tokens */
+  --color-mint: var(--mint);
+  --color-mint-foreground: var(--mint-foreground);
+  --color-hairline: var(--hairline);
 }
 
 :root {
@@ -68,6 +73,11 @@
   --shadow-2xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.13);
   --tracking-normal: 0rem;
   --spacing: 0.25rem;
+
+  /* Brand */
+  --mint: oklch(0.88 0.22 158);
+  --mint-foreground: oklch(0.13 0 0);
+  --hairline: oklch(0.25 0 0);
 }
 
 .dark {
@@ -115,6 +125,50 @@
   --shadow-lg: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 4px 6px -1px hsl(0 0% 0% / 0.05);
   --shadow-xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 8px 10px -1px hsl(0 0% 0% / 0.05);
   --shadow-2xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.13);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html,
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1 {
+    @apply text-6xl md:text-[96px] lg:text-[120px] font-medium tracking-tighter leading-[0.85];
+  }
+
+  h2 {
+    @apply text-5xl md:text-[60px] lg:text-[72px] font-medium tracking-tighter leading-[0.95];
+  }
+
+  h3 {
+    @apply text-2xl md:text-4xl font-medium tracking-tight;
+  }
+
+  p {
+    @apply text-base md:text-lg font-light leading-relaxed;
+  }
+}
+
+@layer utilities {
+  .text-mono-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .hairline {
+    border-color: var(--hairline);
+  }
 }
 
 body {

@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft,
   Send,
   Mail,
   MapPin,
@@ -12,10 +11,34 @@ import {
   CheckCircle2,
   MessageSquare,
   Clock,
-  ArrowUpRight,
+  Calendar,
+  Video,
+  ArrowRight,
 } from "lucide-react";
 import { GlobePulse } from "@/components/ui/cobe-globe-pulse";
 import { CustomSelect } from "@/components/ui/custom-select";
+import { Navbar } from "@/components/ui/navbar";
+import { Footer } from "@/components/ui/footer";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
+
+function useLocalTime() {
+  const [time, setTime] = useState("");
+  useEffect(() => {
+    const update = () =>
+      setTime(
+        new Intl.DateTimeFormat("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "Asia/Kolkata",
+          hour12: false,
+        }).format(new Date())
+      );
+    update();
+    const id = setInterval(update, 30_000);
+    return () => clearInterval(id);
+  }, []);
+  return time;
+}
 
 const INFO_CARDS = [
   {
@@ -30,16 +53,6 @@ const INFO_CARDS = [
     value: "+1 (555) 000-1234",
     href: "tel:+15550001234",
   },
-  {
-    icon: MapPin,
-    label: "Location",
-    value: "San Francisco, CA",
-  },
-  {
-    icon: Clock,
-    label: "Response Time",
-    value: "Within 24 hours",
-  },
 ];
 
 const SERVICES = [
@@ -53,7 +66,17 @@ const SERVICES = [
   "AI Solutions",
 ];
 
+const CALL_SLOTS = [
+  "Mon 09 · 3pm",
+  "Tue 10 · 11am",
+  "Wed 11 · 4pm",
+  "Thu 12 · 2pm",
+  "Thu 12 · 5pm",
+  "Fri 13 · 10am",
+];
+
 export default function ContactPage() {
+  const [tab, setTab] = useState<"message" | "call">("call");
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -63,6 +86,7 @@ export default function ContactPage() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const time = useLocalTime();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -73,7 +97,6 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    // Simulate send — replace with your API call
     await new Promise((r) => setTimeout(r, 1500));
     setSending(false);
     setSent(true);
@@ -81,217 +104,263 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-screen w-full bg-black text-white overflow-x-hidden">
-      {/* Nav */}
-      <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-black/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft size={16} />
-            Back to Home
-          </Link>
-          <span className="text-sm font-semibold tracking-tight text-white">
-            TechCo
-          </span>
-        </div>
-      </nav>
+    <main className="min-h-screen w-full bg-black text-white selection:bg-mint/30 overflow-x-hidden">
+      <Navbar />
 
-      {/* ============ HERO WITH GLOBE ============ */}
-      <section className="relative pt-28 pb-10 md:pt-36 md:pb-16 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          {/* Left — text */}
-          <div className="text-center lg:text-left order-2 lg:order-1">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border border-white/10 bg-white/5 text-xs font-medium text-zinc-300">
-              <MessageSquare size={14} />
-              Let&apos;s Talk
-            </div>
+      {/* ============ HERO SECTION ============ */}
+      <section className="relative pt-36 pb-16 px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="text-center lg:text-left">
+            <ScrollReveal direction="up">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border border-mint/20 bg-mint/5 text-xs font-medium text-mint">
+                <MessageSquare size={14} />
+                Initialize // Let's Talk
+              </div>
 
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] mb-5">
-              <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-500">
-                Get in Touch
-              </span>
-            </h1>
+              <h1 className="mb-6">
+                Let's build <span className="text-zinc-500">together.</span>
+              </h1>
 
-            <p className="text-lg text-zinc-400 max-w-md mx-auto lg:mx-0 leading-relaxed mb-8">
-              Have a project in mind? Send us your inquiry and we&apos;ll get back to you within 24 hours.
-            </p>
+              <p className="text-lg text-zinc-400 max-w-md mx-auto lg:mx-0 leading-relaxed mb-10">
+                Pick your preferred route. Whether it's a quick message or a deep-dive discovery call, we respond in under 12 hours.
+              </p>
 
-            {/* Info mini-cards inline */}
-            <div className="grid grid-cols-2 gap-3 max-w-md mx-auto lg:mx-0">
-              {INFO_CARDS.map((card) => {
-                const content = (
-                  <div className="flex items-start gap-3">
-                    <card.icon size={16} className="text-zinc-500 mt-0.5 shrink-0" />
-                    <div>
-                      <p className="text-[10px] uppercase tracking-widest text-zinc-600 font-semibold">
-                        {card.label}
-                      </p>
-                      <p className="text-xs text-zinc-300 font-medium mt-0.5">
-                        {card.value}
-                      </p>
+              <div className="space-y-6 max-w-md mx-auto lg:mx-0">
+                {/* Local Time Card */}
+                <div className="p-6 rounded-2xl border border-white/5 bg-zinc-950/50 backdrop-blur-sm flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-1">Local Time // IST</p>
+                    <div className="flex items-center gap-3">
+                      <span className="size-2 bg-mint rounded-full animate-pulse" />
+                      <span className="text-2xl font-mono tabular-nums">{time || "--:--"}</span>
                     </div>
                   </div>
-                );
-
-                return card.href ? (
-                  <a
-                    key={card.label}
-                    href={card.href}
-                    className="group p-3.5 rounded-xl border border-white/5 bg-zinc-950 hover:border-white/10 transition-colors"
-                  >
-                    {content}
-                  </a>
-                ) : (
-                  <div
-                    key={card.label}
-                    className="p-3.5 rounded-xl border border-white/5 bg-zinc-950"
-                  >
-                    {content}
+                  <div className="text-right">
+                    <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-1">Status</p>
+                    <span className="text-xs text-zinc-300 font-medium">Engineers Online</span>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Right — globe */}
-          <div className="order-1 lg:order-2 flex items-center justify-center">
-            <div className="w-full max-w-[400px] lg:max-w-[480px]">
-              <GlobePulse speed={0.004} />
-            </div>
-          </div>
-        </div>
-
-        {/* Radial glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-gradient-to-b from-cyan-500/5 via-transparent to-transparent rounded-full blur-3xl pointer-events-none" />
-      </section>
-
-      {/* ============ FORM ============ */}
-      <section className="px-6 pb-24 md:pb-32">
-        <div className="max-w-3xl mx-auto">
-          <div className="rounded-3xl border border-white/5 bg-zinc-950 p-8 md:p-12">
-            {sent ? (
-              /* Success state */
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-6">
-                  <CheckCircle2 size={32} className="text-emerald-400" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">Message Sent</h3>
-                <p className="text-zinc-400 text-sm max-w-sm mb-8">
-                  Thank you for reaching out. We&apos;ll review your inquiry and get back to you within 24 hours.
-                </p>
-                <button
-                  onClick={() => setSent(false)}
-                  className="text-sm font-medium text-zinc-400 hover:text-white transition-colors underline underline-offset-4"
-                >
-                  Send another message
-                </button>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {INFO_CARDS.map((card) => (
+                    <a
+                      key={card.label}
+                      href={card.href}
+                      className="group p-5 rounded-2xl border border-white/5 bg-zinc-950/50 hover:border-mint/30 transition-all duration-300 flex items-start gap-4"
+                    >
+                      <div className="p-2 rounded-lg bg-white/5 border border-white/10 shrink-0">
+                        <card.icon size={18} className="text-mint" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-1">
+                          {card.label}
+                        </p>
+                        <p className="text-sm text-zinc-300 font-medium whitespace-nowrap">
+                          {card.value}
+                        </p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
               </div>
-            ) : (
-              /* Form */
-              <form ref={formRef} onSubmit={handleSubmit} className="space-y-7">
-                <div className="mb-2">
-                  <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">
-                    Send us a message
-                  </h2>
-                  <p className="text-sm text-zinc-500">
-                    Fill out the form below and we&apos;ll be in touch.
-                  </p>
-                </div>
+            </ScrollReveal>
+          </div>
 
-                {/* Name + Email */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      required
-                      value={formState.name}
-                      onChange={handleChange}
-                      placeholder="Your name"
-                      className="w-full bg-white/3 border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-colors"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      value={formState.email}
-                      onChange={handleChange}
-                      placeholder="you@company.com"
-                      className="w-full bg-white/3 border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                {/* Service — custom select */}
-                <CustomSelect
-                  label="Service Interested In"
-                  value={formState.service}
-                  onChange={(val) =>
-                    setFormState((prev) => ({ ...prev, service: val }))
-                  }
-                  options={SERVICES}
-                  placeholder="Select a service"
-                />
-
-                {/* Message */}
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                    Message
-                  </label>
-                  <textarea
-                    name="message"
-                    required
-                    rows={5}
-                    value={formState.message}
-                    onChange={handleChange}
-                    placeholder="Tell us about your project, goals, and timeline..."
-                    className="w-full bg-white/3 border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-colors resize-none"
-                  />
-                </div>
-
-                {/* Submit */}
-                <button
-                  type="submit"
-                  disabled={sending}
-                  className="w-full md:w-auto flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full bg-white text-black text-sm font-semibold hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  {sending ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send size={16} />
-                      Send Message
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
+          <div className="flex items-center justify-center">
+            <ScrollReveal direction="right" delay={0.2}>
+              <div className="w-full max-w-[500px] aspect-square relative group">
+                <div className="absolute inset-0 bg-mint/5 blur-[100px] rounded-full" />
+                <GlobePulse speed={0.003} />
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-10 px-6 border-t border-white/5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-zinc-600">
-          <span>TechCo</span>
-          <Link href="/" className="hover:text-white transition-colors">
-            Home
-          </Link>
+      {/* ============ INTERACTIVE SECTION ============ */}
+      <section className="px-6 pb-32">
+        <div className="max-w-4xl mx-auto">
+          <ScrollReveal direction="up" delay={0.3}>
+            <div className="mb-10 flex border border-white/5 bg-zinc-950/50 p-1.5 rounded-2xl w-fit mx-auto md:mx-0">
+              <button
+                onClick={() => setTab("call")}
+                className={`flex items-center gap-2 px-8 py-3 text-xs font-bold uppercase tracking-widest transition-all rounded-xl ${
+                  tab === "call" ? "bg-mint text-black" : "text-zinc-500 hover:text-white"
+                }`}
+              >
+                <Calendar size={14} />
+                Book a Call
+              </button>
+              <button
+                onClick={() => setTab("message")}
+                className={`flex items-center gap-2 px-8 py-3 text-xs font-bold uppercase tracking-widest transition-all rounded-xl ${
+                  tab === "message" ? "bg-mint text-black" : "text-zinc-500 hover:text-white"
+                }`}
+              >
+                <MessageSquare size={14} />
+                Send a Message
+              </button>
+            </div>
+
+            <div className="rounded-[2.5rem] border border-white/5 bg-zinc-950/50 backdrop-blur-sm p-8 md:p-16 relative overflow-hidden min-h-[600px]">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-mint/5 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2" />
+              
+              {tab === "call" ? (
+                <div className="relative z-10 flex flex-col items-center md:items-start">
+                   <div className="mb-12 text-center md:text-left">
+                    <h2 className="tracking-tight lowercase mb-3">
+                      Discovery Call.
+                    </h2>
+                    <p className="text-zinc-500 max-w-sm">
+                      Pick a 30-minute slot that works for you. We&apos;ll send a calendar invite with a video link — no interrogations, just engineering talk.
+                    </p>
+                  </div>
+
+                  <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-3 mb-10">
+                    {CALL_SLOTS.map((slot) => (
+                      <button
+                        key={slot}
+                        className="text-[11px] font-mono py-4 border border-white/5 bg-zinc-900/50 rounded-xl hover:border-mint hover:text-mint transition-all text-zinc-400 capitalize"
+                      >
+                        {slot}
+                      </button>
+                    ))}
+                  </div>
+
+                  <a
+                    href="https://cal.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-3 px-12 py-5 rounded-full bg-white text-black font-bold hover:scale-105 active:scale-95 transition-all shadow-xl"
+                  >
+                    View All Availability
+                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  </a>
+
+                  <div className="mt-12 flex items-center gap-4 text-xs text-zinc-500 font-mono">
+                    <div className="flex items-center gap-2">
+                      <Video size={14} className="text-mint" />
+                      Google Meet
+                    </div>
+                    <span>•</span>
+                    <div className="flex items-center gap-2">
+                      <Clock size={14} className="text-mint" />
+                      30 Minutes
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {sent ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-center relative z-10 h-full">
+                      <div className="w-20 h-20 rounded-full bg-mint/10 border border-mint/20 flex items-center justify-center mb-8 shadow-[0_0_30px_rgba(0,255,163,0.1)]">
+                        <CheckCircle2 size={40} className="text-mint" />
+                      </div>
+                      <h2 className="mb-4">Transmission Successful.</h2>
+                      <p className="text-zinc-500 text-base max-w-sm mb-10">
+                        Your message has been encrypted and sent to our team. Expect a response in under 12 hours.
+                      </p>
+                      <button
+                        onClick={() => setSent(false)}
+                        className="text-mono-tag text-mint hover:text-white transition-colors underline underline-offset-8"
+                      >
+                        Resend Connection Request
+                      </button>
+                    </div>
+                  ) : (
+                    <form ref={formRef} onSubmit={handleSubmit} className="space-y-8 relative z-10">
+                      <div className="mb-10 text-center md:text-left">
+                        <h2 className="tracking-tight lowercase mb-3">
+                          Direct Protocol.
+                        </h2>
+                        <p className="text-zinc-500">
+                          Brief us on your objectives and we'll engineer the path forward.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 ml-1">
+                            Full Name
+                          </label>
+                          <input
+                            type="text"
+                            name="name"
+                            required
+                            value={formState.name}
+                            onChange={handleChange}
+                            placeholder="John Doe"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-mint/30 focus:ring-1 focus:ring-mint/10 transition-all"
+                          />
+                        </div>
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 ml-1">
+                            Email Address
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            required
+                            value={formState.email}
+                            onChange={handleChange}
+                            placeholder="john@company.com"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-mint/30 focus:ring-1 focus:ring-mint/10 transition-all"
+                          />
+                        </div>
+                      </div>
+
+                      <CustomSelect
+                        label="Objective // Service"
+                        value={formState.service}
+                        onChange={(val) =>
+                          setFormState((prev) => ({ ...prev, service: val }))
+                        }
+                        options={SERVICES}
+                        placeholder="Select a category"
+                      />
+
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 ml-1">
+                          Project Details
+                        </label>
+                        <textarea
+                          name="message"
+                          required
+                          rows={6}
+                          value={formState.message}
+                          onChange={handleChange}
+                          placeholder="Objectives, timeframe, and technical requirements..."
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-mint/30 focus:ring-1 focus:ring-mint/10 transition-all resize-none"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={sending}
+                        className="w-full md:w-auto flex items-center justify-center gap-3 px-10 py-5 rounded-full bg-mint text-black text-sm font-bold shadow-[0_0_20px_rgba(0,255,163,0.2)] hover:shadow-[0_0_30px_rgba(0,255,163,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      >
+                        {sending ? (
+                          <>
+                            <Loader2 size={18} className="animate-spin" />
+                            Transmitting...
+                          </>
+                        ) : (
+                          <>
+                            <Send size={18} />
+                            Send Request
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+                </>
+              )}
+            </div>
+          </ScrollReveal>
         </div>
-      </footer>
+      </section>
+
+      <Footer />
     </main>
   );
 }

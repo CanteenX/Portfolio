@@ -51,34 +51,15 @@ export const PROJECTS: Project[] = [
       { src: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?auto=format&fit=crop&w=1600&q=80", caption: "Reconciliation report" },
       { src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1600&q=80", caption: "Latency monitoring (Datadog)" },
     ],
-    codeSnippet: {
-      language: "typescript",
-      label: "lib/ledger/idempotency.ts",
-      code: `export async function withIdempotency<T>(
-  key: string,
-  ttlSec: number,
-  fn: () => Promise<T>,
-): Promise<T> {
-  const acquired = await redis.set(\`idem:\${key}\`, "1", "EX", ttlSec, "NX");
-  if (!acquired) {
-    const cached = await redis.get(\`idem:\${key}:result\`);
-    if (cached) return JSON.parse(cached);
-    throw new ConflictError("In-flight request");
-  }
-  const result = await fn();
-  await redis.set(\`idem:\${key}:result\`, JSON.stringify(result), "EX", ttlSec);
-  return result;
-}`,
-    },
     architecture: "Client → API Gateway (idempotency) → Kafka → Ledger writer → Postgres projections → Read API",
   },
   {
-    slug: "consumer-mobile",
-    title: "Cross-platform mobile app",
+    slug: "we-converse",
+    title: "We Converse",
     category: "Native Mobile",
     metric: "100k downloads",
     year: "2024",
-    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1600&q=80",
+    image: "https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1600&q=80",
     client: "DTC lifestyle brand",
     timeframe: "10 weeks · Q3 2024",
     role: "Mobile engineering, design system, release ops",
@@ -104,18 +85,6 @@ export const PROJECTS: Project[] = [
       { src: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=1600&q=80", caption: "Product detail with Reanimated parallax" },
       { src: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1600&q=80", caption: "Checkout — biometric auth" },
     ],
-    codeSnippet: {
-      language: "tsx",
-      label: "components/ParallaxHeader.tsx",
-      code: `const scroll = useSharedValue(0);
-const onScroll = useAnimatedScrollHandler((e) => {
-  scroll.value = e.contentOffset.y;
-});
-const headerStyle = useAnimatedStyle(() => ({
-  transform: [{ translateY: scroll.value * 0.5 }],
-  opacity: interpolate(scroll.value, [0, 200], [1, 0]),
-}));`,
-    },
   },
   {
     slug: "saas-dashboard",
@@ -180,67 +149,6 @@ const headerStyle = useAnimatedStyle(() => ({
     gallery: [
       { src: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1600&q=80", caption: "Fleet operations console" },
       { src: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80", caption: "Service mesh topology" },
-    ],
-  },
-  {
-    slug: "health-tracker",
-    title: "Native iOS health tracker",
-    category: "Native Mobile",
-    metric: "60fps animations",
-    year: "2023",
-    image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1600&q=80",
-    client: "Wellness startup (seed-stage)",
-    timeframe: "12 weeks · 2023",
-    role: "Native iOS, HealthKit integration",
-    stack: ["Swift", "SwiftUI", "HealthKit", "Core Data", "CloudKit", "Combine"],
-    problem:
-      "An MVP needed to ingest HealthKit data, render rich charts at 60fps, and sync across a user's devices without running their own backend.",
-    solution:
-      "Pure SwiftUI app with a Combine-based HealthKit pipeline. Persistence is Core Data + CloudKit so sync is free. Charts are custom Metal-backed for guaranteed frame timing.",
-    roi: [
-      "Shipped to TestFlight in 8 weeks, App Store in 12",
-      "Steady 60fps on iPhone 11 and newer",
-      "Zero backend infrastructure to operate",
-    ],
-    features: [
-      { title: "HealthKit pipeline", description: "Combine operators normalize 14 sample types into a unified timeline." },
-      { title: "CloudKit sync", description: "Cross-device sync without a custom server." },
-      { title: "Metal charts", description: "Custom shader for buttery-smooth scrubbing through years of data." },
-    ],
-    gallery: [
-      { src: "https://images.unsplash.com/photo-1554344728-77cf90d9ed26?auto=format&fit=crop&w=1600&q=80", caption: "Daily summary" },
-      { src: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=1600&q=80", caption: "Trends view" },
-    ],
-  },
-  {
-    slug: "commerce-platform",
-    title: "Headless commerce platform",
-    category: "Web Apps",
-    metric: "$14M GMV",
-    year: "2023",
-    image: "https://images.unsplash.com/photo-1556742400-b5b7c5121f5f?auto=format&fit=crop&w=1600&q=80",
-    client: "Fashion DTC group (3 brands)",
-    timeframe: "18 weeks · 2023",
-    role: "Frontend, BFF, search, performance",
-    stack: ["Next.js", "TypeScript", "Shopify Storefront API", "Algolia", "Stripe", "Vercel Edge"],
-    problem:
-      "Three brands shared a slow Liquid theme with a 4.2s LCP. Conversion was bleeding on mobile and merchandising changes took engineering tickets.",
-    solution:
-      "Headless Next.js storefronts on Vercel Edge with ISR. Algolia powers search and merchandising rules so the marketing team ships without devs. Stripe handles checkout for non-Shopify SKUs.",
-    roi: [
-      "$14M GMV in first 12 months across the 3 brands",
-      "LCP from 4.2s to 1.1s on mobile (p75)",
-      "Mobile conversion +28%",
-      "Merchandising changes in <5 min, no deploy",
-    ],
-    features: [
-      { title: "Edge-rendered storefronts", description: "Vercel Edge + ISR for sub-second TTFB globally." },
-      { title: "Self-serve merchandising", description: "Algolia rules UI for the marketing team." },
-      { title: "Composable checkout", description: "Stripe + Shopify hybrid for catalog flexibility." },
-    ],
-    gallery: [
-      { src: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80", caption: "Brand storefront" },
-      { src: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80", caption: "Product detail" },
     ],
   },
 ];
