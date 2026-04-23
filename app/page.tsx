@@ -10,6 +10,8 @@ import FeatureCarousel from "@/components/ui/feature-carousel";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { Languages, ShoppingCart, HeartPulse, Landmark } from "lucide-react";
 
+import { Footer } from "@/components/ui/footer";
+
 export default function Home() {
   // Sample project data
   const projects = [
@@ -43,7 +45,7 @@ export default function Home() {
       <Navbar />
 
       {/* Hero Section with 3D Robot */}
-      <section id="about" className="min-h-screen pt-16 px-4 bg-black flex items-center justify-center">
+      <section id="hero" className="min-h-screen pt-16 px-4 bg-black flex items-center justify-center">
         <ScrollReveal direction="up" duration={1.2}>
           <div className="max-w-7xl mx-auto">
             <SplineSceneBasic />
@@ -141,21 +143,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="py-16 px-4 border-t border-white/10 bg-black">
-        <ScrollReveal direction="none">
-          <div className="max-w-7xl mx-auto text-center">
-            <p className="text-gray-400 mb-4">
-              © 2024 TechCo. Building the future with AI and innovation.
-            </p>
-            <div className="flex justify-center gap-6 text-sm text-gray-500">
-              <a href="#" className="hover:text-white transition-colors">About</a>
-              <a href="#" className="hover:text-white transition-colors">Services</a>
-              <a href="/contact" className="hover:text-white transition-colors">Contact</a>
-              <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            </div>
-          </div>
-        </ScrollReveal>
-      </footer>
+      <Footer />
     </main>
     </SmoothScroll>
   );

@@ -18,10 +18,10 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            <NavLink href="#about" label="About" />
+            <NavLink href="/work" label="Work" />
             <NavLink href="/projects" label="Projects" />
             <NavLink href="#services" label="Services" />
-            <NavLink href="/contact" label="Contact Us" />
+            <NavLink href="/contact" label="Let's Talk" />
           </div>
 
           {/* Mobile menu button */}
@@ -44,10 +44,10 @@ export function Navbar() {
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-zinc-800/95 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
             <div className="flex flex-col py-4 px-6 space-y-2">
-              <MobileNavLink href="#about" label="About" onClick={() => setMobileMenuOpen(false)} />
+              <MobileNavLink href="/work" label="Work" onClick={() => setMobileMenuOpen(false)} />
               <MobileNavLink href="/projects" label="Projects" onClick={() => setMobileMenuOpen(false)} />
               <MobileNavLink href="#services" label="Services" onClick={() => setMobileMenuOpen(false)} />
-              <MobileNavLink href="/contact" label="Contact Us" onClick={() => setMobileMenuOpen(false)} />
+              <MobileNavLink href="/contact" label="Let's Talk" onClick={() => setMobileMenuOpen(false)} />
             </div>
           </div>
         )}
@@ -64,14 +64,6 @@ function NavLink({ href, label }: { href: string; label: string }) {
     >
       <span className="flex items-center gap-1.5">
         {label}
-        <svg
-          className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-        </svg>
       </span>
     </a>
   );
@@ -85,14 +77,6 @@ function MobileNavLink({ href, label, onClick }: { href: string; label: string; 
       className="flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-200 hover:text-white hover:bg-white/5 transition-all duration-200 rounded-xl"
     >
       <span>{label}</span>
-      <svg
-        className="w-3 h-3 opacity-70"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-      </svg>
     </a>
   );
 }
