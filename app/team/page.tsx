@@ -2,19 +2,21 @@
 
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
-import { TEAM } from "@/lib/team";
 import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
+const PLAYBOOK: any[] = [];
+const TEAM: any[] = [];
 
-const PLAYBOOK = [
-  { phase: "01", name: "Discovery", body: "1-week deep dive: scope, success metrics, architecture sketch." },
-  { phase: "02", name: "Weekly Sprints", body: "Demoed builds every Friday. Direct Slack channel. Async-first." },
-  { phase: "03", name: "QA & Hardening", body: "Automated tests, load testing, security review, observability." },
-  { phase: "04", name: "Launch & Handover", body: "Production deploy, runbooks, knowledge transfer, on-call support." },
-];
+import { useCmsContent } from "@/lib/hooks/use-cms-content";
 
 export default function TeamPage() {
+  const { getSection } = useCmsContent("team");
+  const headerData = getSection("header");
+  const membersData = getSection("members");
+  
+  const displayTeam = membersData?.list || TEAM;
+
   return (
     <main className="min-h-screen bg-black text-white selection:bg-mint/30">
       <Navbar />
@@ -22,14 +24,15 @@ export default function TeamPage() {
       <div className="pt-28 pb-16 px-6">
         <div className="max-w-7xl mx-auto">
           <ScrollReveal direction="up">
-            <div className="text-mono-tag text-mint mb-4">/team — The Collective</div>
-            <h1 className="mb-12 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-              The engineers behind the code.
-            </h1>
+            <div className="text-mono-tag text-mint mb-4">{headerData?.label || "/team — The Collective"}</div>
+            <h1 
+              className="mb-12 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400"
+              dangerouslySetInnerHTML={{ __html: headerData?.title || "The architects of the future." }}
+            />
           </ScrollReveal>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5 border hairline mb-20 overflow-hidden rounded-3xl">
-            {TEAM.map((p, index) => (
+            {displayTeam.map((p: any, index: number) => (
               <ScrollReveal key={p.slug} delay={index * 0.1} direction="up">
                 <Link
                   href={`/team/${p.slug}`}

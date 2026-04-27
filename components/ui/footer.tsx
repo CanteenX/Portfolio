@@ -2,8 +2,12 @@
 
 import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { useSiteSettings } from "@/lib/hooks/use-cms-content";
 
 export function Footer() {
+  const { settings } = useSiteSettings();
+  const contactEmail = settings?.socialLinks?.email || "hello@forge.dev";
+
   return (
     <footer className="border-t hairline mt-16 bg-black">
       <ScrollReveal direction="up">
@@ -14,7 +18,7 @@ export function Footer() {
               FORGE_COLLECTIVE
             </div>
             <p className="text-zinc-500 text-sm max-w-sm leading-relaxed font-light">
-              An elite collective engineering high-performance web and mobile products for global brands.
+              {settings?.heroDescription || "An elite collective engineering high-performance web and mobile products for global brands."}
             </p>
           </div>
           <div>
@@ -29,10 +33,15 @@ export function Footer() {
           </div>
           <div>
             <div className="text-mono-tag text-zinc-500 mb-6">/contact</div>
-            <a href="mailto:hello@forge.dev" className="text-mono-tag text-zinc-400 hover:text-mint block mb-4 transition-colors">hello@forge.dev</a>
+            <a href={`mailto:${contactEmail}`} className="text-mono-tag text-zinc-400 hover:text-mint block mb-4 transition-colors">
+              {contactEmail}
+            </a>
             <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-[0.2em] leading-relaxed">
               v4.2 — STABLE_BUILD
             </div>
+            {settings?.socialLinks?.linkedin && (
+              <a href={settings.socialLinks.linkedin} target="_blank" rel="noreferrer" className="text-[10px] text-zinc-600 hover:text-mint mt-4 block">LINKEDIN //</a>
+            )}
           </div>
         </div>
       </ScrollReveal>

@@ -75,9 +75,17 @@
   --spacing: 0.25rem;
 
   /* Brand */
-  --mint: oklch(0.88 0.22 158);
-  --mint-foreground: oklch(0.13 0 0);
-  --hairline: oklch(0.25 0 0);
+  --mint: var(--accent, oklch(0.88 0.22 158));
+  --accent-dim: var(--accent-dim, oklch(0.8 0.2 158));
+  --accent-muted: var(--accent-muted, oklch(0.5 0.15 158));
+  --mint-foreground: var(--text-primary, oklch(0.13 0 0));
+  
+  --background: var(--bg-primary, oklch(0.0500 0 0));
+  --foreground: var(--text-primary, oklch(0.9500 0 0));
+  --card: var(--bg-card, oklch(0.0800 0 0));
+  --card-foreground: var(--text-primary, oklch(0.9500 0 0));
+  --border: var(--border, oklch(0.2000 0 0));
+  --hairline: var(--border, oklch(0.25 0 0));
 }
 
 .dark {

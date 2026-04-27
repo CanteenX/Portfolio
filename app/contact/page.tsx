@@ -75,7 +75,12 @@ const CALL_SLOTS = [
   "Fri 13 · 10am",
 ];
 
+import { useCmsContent } from "@/lib/hooks/use-cms-content";
+
 export default function ContactPage() {
+  const { getSection } = useCmsContent("contact");
+  const headerData = getSection("header");
+  
   const [tab, setTab] = useState<"message" | "call">("call");
   const [formState, setFormState] = useState({
     name: "",
@@ -114,15 +119,16 @@ export default function ContactPage() {
             <ScrollReveal direction="up">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border border-mint/20 bg-mint/5 text-xs font-medium text-mint">
                 <MessageSquare size={14} />
-                Initialize // Let's Talk
+                {headerData?.label || "Initialize // Let's Talk"}
               </div>
 
-              <h1 className="mb-6">
-                Let's build <span className="text-zinc-500">together.</span>
-              </h1>
+              <h1 
+                className="mb-6"
+                dangerouslySetInnerHTML={{ __html: headerData?.title || "Let's build <span class='text-zinc-500'>together.</span>" }}
+              />
 
               <p className="text-lg text-zinc-400 max-w-md mx-auto lg:mx-0 leading-relaxed mb-10">
-                Pick your preferred route. Whether it's a quick message or a deep-dive discovery call, we respond in under 12 hours.
+                {headerData?.description || "Pick your preferred route. Whether it's a quick message or a deep-dive discovery call, we respond in under 12 hours."}
               </p>
 
               <div className="space-y-6 max-w-md mx-auto lg:mx-0">

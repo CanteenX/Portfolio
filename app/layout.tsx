@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   description: "Cutting-edge AI and full-stack development solutions that transform ideas into reality.",
 };
 
+import { ThemeEngine } from "@/components/ui/theme-engine";
+import { MetaManager } from "@/components/ui/meta-manager";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,7 +25,11 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <ThemeEngine />
+        <MetaManager />
+        {children}
+      </body>
     </html>
   );
 }

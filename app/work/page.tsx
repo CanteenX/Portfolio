@@ -9,11 +9,19 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
 import Link from "next/link";
 
+import { useCmsContent } from "@/lib/hooks/use-cms-content";
+import { useProjects } from "@/lib/hooks/use-projects";
+
 const FILTERS = ["All", "Native Mobile", "Web Apps", "Backend/Cloud"] as const;
 
 export default function WorkPage() {
+  const { getSection } = useCmsContent("work");
+  const { projects, isLoading: projectsLoading } = useProjects();
+  
+  const headerData = getSection("header");
   const [filter, setFilter] = useState<typeof FILTERS[number]>("All");
-  const filtered = filter === "All" ? PROJECTS : PROJECTS.filter((p) => p.category === filter);
+  
+  const filtered = filter === "All" ? projects : projects.filter((p: any) => p.category === filter);
 
   return (
     <SmoothScroll>
@@ -23,11 +31,12 @@ export default function WorkPage() {
         <div className="pt-36 pb-20 px-6 max-w-7xl mx-auto">
           <ScrollReveal direction="up">
             <div className="font-mono text-xs uppercase tracking-widest text-emerald-500 mb-6">
-              /work — Selected Engagements
+              {headerData?.label || "/work — Selected Engagements"}
             </div>
-            <h1 className="text-5xl md:text-8xl font-bold tracking-tighter mb-12 max-w-4xl leading-[0.9]">
-              Engineering that solves <span className="text-zinc-600 italic">business</span> problems.
-            </h1>
+            <h1 
+              className="text-5xl md:text-8xl font-bold tracking-tighter mb-12 max-w-4xl leading-[0.9]"
+              dangerouslySetInnerHTML={{ __html: headerData?.title || "Engineering that solves <span class='text-zinc-600 italic'>business</span> problems." }}
+            />
           </ScrollReveal>
 
           {/* Filters */}
@@ -51,7 +60,7 @@ export default function WorkPage() {
 
           {/* Projects Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5 border border-white/5 overflow-hidden rounded-3xl">
-            {filtered.map((p, idx) => (
+            {filtered.map((p: any, idx: number) => (
               <ScrollReveal key={p.slug} delay={idx * 0.05} direction="up">
                 <Link
                   href={`/projects/${p.slug}`}

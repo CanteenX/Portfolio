@@ -12,48 +12,28 @@ import Link from "next/link";
 import { ContactCTA } from "@/components/ui/contact-cta";
 import { Footer } from "@/components/ui/footer";
 
-const TECH = [
+import { useCmsContent } from "@/lib/hooks/use-cms-content";
+import { useProjects } from "@/lib/hooks/use-projects";
+
+const DEFAULT_TECH = [
   "AWS", "REACT_NATIVE", "NODE.JS", "GRAPHQL", "POSTGRESQL",
   "TYPESCRIPT", "KUBERNETES", "NEXT.JS", "SWIFT", "KOTLIN",
   "TERRAFORM", "REDIS",
 ];
 
-const projects = [
-  {
-    title: "We Converse App",
-    description: "Meeting app with live translation in any language and automatic minutes of meeting generation.",
-    href: "/projects/we-converse",
-    icon: <Languages className="w-5 h-5" />,
-    image: "https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1200&q=80",
-    eyebrow: "Deployment 01 // Mobile",
-  },
-  {
-    title: "E-Commerce Solution",
-    description: "Full-stack e-commerce platform with AI-driven personalization and recommendations.",
-    href: "#",
-    icon: <ShoppingCart className="w-5 h-5" />,
-    image: "https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&w=1200&q=80",
-    eyebrow: "Deployment 02 // Web",
-  },
-  {
-    title: "Healthcare Dashboard",
-    description: "HIPAA-compliant patient management system with intelligent workflow automation.",
-    href: "#",
-    icon: <HeartPulse className="w-5 h-5" />,
-    image: "https://images.unsplash.com/photo-1576091160550-2173dad99978?auto=format&fit=crop&w=1200&q=80",
-    eyebrow: "Deployment 03 // Dashboard",
-  },
-  {
-    title: "FinTech App",
-    description: "Secure financial application with AI fraud detection and blockchain integration.",
-    href: "#",
-    icon: <Landmark className="w-5 h-5" />,
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
-    eyebrow: "Deployment 04 // Fintech",
-  },
-];
 
 export default function Home() {
+  const { getSection, isLoading: cmsLoading } = useCmsContent("home");
+  const { projects: allProjects, isLoading: projectsLoading } = useProjects();
+
+  const heroData = getSection("hero");
+  const stackData = getSection("stack");
+  const servicesIntro = getSection("services-intro");
+  const aiIntro = getSection("ai-intro");
+
+  const techStack = stackData?.technologies || DEFAULT_TECH;
+  const projects = allProjects.slice(0, 4);
+
   return (
     <SmoothScroll>
     <main className="min-h-screen w-full overflow-x-hidden bg-black text-white selection:bg-mint/30">
@@ -61,16 +41,16 @@ export default function Home() {
 
       {/* Hero Section */}
       <section id="hero" className="w-full">
-        <SplineSceneBasic />
+        <SplineSceneBasic data={heroData} />
       </section>
 
       {/* Validated Stack Banner */}
       <section className="border-y border-white/5 bg-zinc-950/40 relative overflow-hidden">
         <div className="max-w-7xl mx-auto py-8 px-6 flex flex-col md:flex-row items-center gap-8">
-          <div className="shrink-0 text-mono-tag text-zinc-500">Validated_Stack //</div>
+          <div className="shrink-0 text-mono-tag text-zinc-500">{stackData?.label || "Validated_Stack //"}</div>
           <div className="flex-1 overflow-hidden relative w-full">
             <div className="flex gap-12 items-center whitespace-nowrap animate-marquee">
-              {[...TECH, ...TECH].map((t, i) => (
+              {[...techStack, ...techStack].map((t, i) => (
                 <span key={i} className="text-zinc-500 font-mono text-xs tracking-tighter flex items-center gap-2">
                   <span className="size-1 bg-mint inline-block" />
                   {t}
@@ -156,10 +136,10 @@ export default function Home() {
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
               <h2 className="mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 lowercase">
-                Services We Offer.
+                {servicesIntro?.title || "Services We Offer."}
               </h2>
               <p className="text-zinc-500 max-w-2xl mx-auto">
-                Comprehensive tech solutions tailored to elevate your business to new heights
+                {servicesIntro?.subtitle || "Comprehensive tech solutions tailored to elevate your business to new heights"}
               </p>
             </div>
           </ScrollReveal>
@@ -170,37 +150,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Tech Stack Section (Commented out)
-      <section id="tech-stack" className="py-16 px-4 bg-black border-t border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <ScrollReveal direction="up">
-            <div className="text-center mb-16">
-              <h2 className="mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 lowercase">
-                Technology Stack.
-              </h2>
-              <p className="text-zinc-500 max-w-2xl mx-auto">
-                Building with modern frameworks and tools for scalable, performant applications
-              </p>
-            </div>
-          </ScrollReveal>
-
-          <ScrollReveal delay={0.2} direction="up">
-            <FeatureSection />
-          </ScrollReveal>
-        </div>
-      </section>
-      */}
-
       {/* AI LLM Services Section */}
       <section id="ai-solutions" className="py-16 px-4 bg-zinc-950/20 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
               <h2 className="mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 lowercase">
-                AI &amp; LLM Services.
+                {aiIntro?.title || "AI & LLM Services."}
               </h2>
               <p className="text-zinc-500 max-w-2xl mx-auto">
-                Custom AI solutions powered by large language models to automate, engage, and scale your business
+                {aiIntro?.subtitle || "Custom AI solutions powered by large language models to automate, engage, and scale your business"}
               </p>
             </div>
           </ScrollReveal>

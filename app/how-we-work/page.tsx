@@ -5,70 +5,9 @@ import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
+import { useCmsContent } from "@/lib/hooks/use-cms-content";
 
-const PHASES = [
-  {
-    id: "discovery",
-    n: "01",
-    title: "Discovery & Planning",
-    description:
-      "We dive deep into your vision, map out user flows, define the tech stack, and build a detailed roadmap — so there are zero surprises down the line.",
-    accent: "from-blue-500/20 to-blue-500/0",
-    dot: "bg-blue-500",
-  },
-  {
-    id: "design",
-    n: "02",
-    title: "UI / UX Design",
-    description:
-      "Pixel-perfect interfaces designed for conversion. Prototypes you can click through before a single line of code is written.",
-    accent: "from-violet-500/20 to-violet-500/0",
-    dot: "bg-violet-500",
-  },
-  {
-    id: "development",
-    n: "03",
-    title: "Development",
-    description:
-      "Clean, modular code built with modern frameworks. Weekly demos keep you in the loop with full transparency.",
-    accent: "from-emerald-500/20 to-emerald-500/0",
-    dot: "bg-emerald-500",
-  },
-  {
-    id: "qa",
-    n: "04",
-    title: "Testing & QA",
-    description:
-      "Rigorous automated and manual testing across devices. We break it so your users never have to.",
-    accent: "from-amber-500/20 to-amber-500/0",
-    dot: "bg-amber-500",
-  },
-  {
-    id: "launch",
-    n: "05",
-    title: "Launch & Deploy",
-    description:
-      "Zero-downtime deployments with CI/CD pipelines, monitoring, and rollback strategies baked in from day one.",
-    accent: "from-rose-500/20 to-rose-500/0",
-    dot: "bg-rose-500",
-  },
-  {
-    id: "scale",
-    n: "06",
-    title: "Support & Scale",
-    description:
-      "Post-launch isn't the end — it's the beginning. Ongoing support, performance tuning, and feature iterations.",
-    accent: "from-cyan-500/20 to-cyan-500/0",
-    dot: "bg-cyan-500",
-  },
-  {
-    id: "why-us",
-    n: "07",
-    title: "Why Build With Us",
-    description: "Battle-tested commitment to excellence.",
-    isHeader: true
-  }
-];
+const PHASES: any[] = [];
 
 const perks = [
   {
@@ -93,9 +32,14 @@ const perks = [
     border: "hover:border-violet-500/30",
   },
 ];
-
 export default function HowWeWork() {
-  const [activeSegment, setActiveSegment] = useState(PHASES[0].id);
+  const { getSection } = useCmsContent("methodology");
+  const heroData = getSection("hero");
+  const protocolData = getSection("protocol");
+  
+  const displayPhases = protocolData?.phases || PHASES;
+  
+  const [activeSegment, setActiveSegment] = useState(displayPhases[0]?.id || "");
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -109,13 +53,13 @@ export default function HowWeWork() {
       { rootMargin: "-30% 0px -60% 0px" }
     );
 
-    PHASES.forEach((p) => {
+    displayPhases.forEach((p: any) => {
       const el = document.getElementById(p.id);
       if (el) observer.observe(el);
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [displayPhases]);
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-mint/30">
@@ -125,17 +69,18 @@ export default function HowWeWork() {
         <div className="max-w-7xl mx-auto">
           {/* Page Header */}
           <ScrollReveal direction="up">
-            <div className="text-mono-tag text-mint mb-4">/methodology — Protocol</div>
-            <h1 className="mb-16">
-              Our engineering <span className="text-zinc-500">methodology.</span>
-            </h1>
+            <div className="text-mono-tag text-mint mb-4">{heroData?.label || "/methodology — Protocol"}</div>
+            <h1 
+              className="mb-16"
+              dangerouslySetInnerHTML={{ __html: heroData?.title || "Our engineering <span class='text-zinc-500'>methodology.</span>" }}
+            />
           </ScrollReveal>
 
           <div className="grid lg:grid-cols-[280px_1fr] gap-12">
             {/* Left sticky tracker */}
             <aside className="hidden lg:block">
               <div className="sticky top-40 border-l border-white/10 space-y-1">
-                {PHASES.map((p) => (
+                {displayPhases.map((p: any) => (
                   <a
                     key={p.id}
                     href={`#${p.id}`}
@@ -159,7 +104,7 @@ export default function HowWeWork() {
                 <div className="absolute left-6 md:left-[2.75rem] top-0 bottom-0 w-px bg-gradient-to-b from-white/20 via-white/10 to-transparent" />
                 
                 <div className="space-y-24">
-                  {PHASES.filter(p => !p.isHeader).map((item, index) => (
+                  {displayPhases.filter((p: any) => !p.isHeader).map((item: any, index: number) => (
                     <section 
                       key={item.id} 
                       id={item.id} 
