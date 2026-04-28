@@ -2,8 +2,32 @@
 
 import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { usePublicSettings } from "@/lib/usePublicAPI";
+import { getPublicSettings } from "@/lib/api";
+
+const FALLBACK = {
+  brandName: "FORGE_COLLECTIVE",
+  description: "An elite collective engineering high-performance web and mobile products for global brands.",
+  email: "hello@forge.dev",
+  version: "v4.2 — STABLE_BUILD",
+  links: [
+    { label: "Work", href: "/work" },
+    { label: "Services", href: "/#services" },
+    { label: "Team", href: "/team" },
+    { label: "Projects", href: "/projects" },
+    { label: "Contact", href: "/contact" },
+  ],
+};
 
 export function Footer() {
+  const { settings } = usePublicSettings(getPublicSettings);
+
+  const brandName = settings?.navbar?.brandName || FALLBACK.brandName;
+  const description = settings?.footer?.description || FALLBACK.description;
+  const email = settings?.footer?.email || FALLBACK.email;
+  const version = settings?.footer?.version || FALLBACK.version;
+  const links = settings?.footer?.links?.length ? settings.footer.links : FALLBACK.links;
+
   return (
     <footer className="border-t hairline mt-16 bg-black">
       <ScrollReveal direction="up">
@@ -11,27 +35,31 @@ export function Footer() {
           <div className="md:col-span-2">
             <div className="font-mono text-sm font-medium flex items-center gap-2 text-white mb-4">
               <span className="size-2.5 bg-mint inline-block" />
-              FORGE_COLLECTIVE
+              {brandName}
             </div>
             <p className="text-zinc-500 text-sm max-w-sm leading-relaxed font-light">
-              An elite collective engineering high-performance web and mobile products for global brands.
+              {description}
             </p>
           </div>
           <div>
             <div className="text-mono-tag text-zinc-500 mb-6">/sitemap</div>
             <ul className="space-y-4 text-mono-tag">
-              <li><Link href="/work" className="text-zinc-400 hover:text-mint transition-colors">Work</Link></li>
-              <li><Link href="/#services" className="text-zinc-400 hover:text-mint transition-colors">Services</Link></li>
-              <li><Link href="/team" className="text-zinc-400 hover:text-mint transition-colors">Team</Link></li>
-              <li><Link href="/projects" className="text-zinc-400 hover:text-mint transition-colors">Projects</Link></li>
-              <li><Link href="/contact" className="text-zinc-400 hover:text-mint transition-colors">Contact</Link></li>
+              {links.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-zinc-400 hover:text-mint transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div>
             <div className="text-mono-tag text-zinc-500 mb-6">/contact</div>
-            <a href="mailto:hello@forge.dev" className="text-mono-tag text-zinc-400 hover:text-mint block mb-4 transition-colors">hello@forge.dev</a>
+            <a href={`mailto:${email}`} className="text-mono-tag text-zinc-400 hover:text-mint block mb-4 transition-colors">
+              {email}
+            </a>
             <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-[0.2em] leading-relaxed">
-              v4.2 — STABLE_BUILD
+              {version}
             </div>
           </div>
         </div>
@@ -39,7 +67,7 @@ export function Footer() {
 
       <div className="border-t hairline">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between gap-4 font-mono text-[10px] text-zinc-600 tracking-[0.2em] uppercase">
-          <span>© {new Date().getFullYear()} Forge Collective. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} {brandName}. All rights reserved.</span>
           <span className="flex items-center gap-2">
             <span className="size-1 bg-mint animate-pulse" />
             All systems operational

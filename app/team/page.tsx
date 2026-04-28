@@ -6,8 +6,10 @@ import { TEAM } from "@/lib/team";
 import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
+import { usePublicAPI, usePublicSettings } from "@/lib/usePublicAPI";
+import { getPublicTeam, getPublicSettings } from "@/lib/api";
 
-const PLAYBOOK = [
+const FALLBACK_PLAYBOOK = [
   { phase: "01", name: "Discovery", body: "1-week deep dive: scope, success metrics, architecture sketch." },
   { phase: "02", name: "Weekly Sprints", body: "Demoed builds every Friday. Direct Slack channel. Async-first." },
   { phase: "03", name: "QA & Hardening", body: "Automated tests, load testing, security review, observability." },
@@ -15,10 +17,14 @@ const PLAYBOOK = [
 ];
 
 export default function TeamPage() {
+  const { data: team } = usePublicAPI(getPublicTeam, TEAM);
+  const { settings } = usePublicSettings(getPublicSettings);
+  const playbook = settings?.teamPlaybook?.length ? settings.teamPlaybook : FALLBACK_PLAYBOOK;
+
   return (
     <main className="min-h-screen bg-black text-white selection:bg-mint/30">
       <Navbar />
-      
+
       <div className="pt-28 pb-16 px-6">
         <div className="max-w-7xl mx-auto">
           <ScrollReveal direction="up">
@@ -29,7 +35,7 @@ export default function TeamPage() {
           </ScrollReveal>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5 border hairline mb-20 overflow-hidden rounded-3xl">
-            {TEAM.map((p, index) => (
+            {team.map((p, index) => (
               <ScrollReveal key={p.slug} delay={index * 0.1} direction="up">
                 <Link
                   href={`/team/${p.slug}`}
@@ -63,9 +69,9 @@ export default function TeamPage() {
               <div className="text-mono-tag text-mint mb-4">Our_Playbook //</div>
               <h2 className="mb-10">How we work.</h2>
             </ScrollReveal>
-            
+
             <div className="grid md:grid-cols-4 gap-px bg-white/5 border hairline rounded-3xl overflow-hidden">
-              {PLAYBOOK.map((p, index) => (
+              {playbook.map((p, index) => (
                 <ScrollReveal key={p.phase} delay={index * 0.1} direction="up">
                   <div className="bg-zinc-900/50 backdrop-blur-sm p-8 h-full border-r border-white/5">
                     <div className="font-mono text-4xl text-mint/50 mb-4 tabular-nums">{p.phase}</div>
@@ -78,9 +84,8 @@ export default function TeamPage() {
           </div>
         </div>
       </div>
-      
+
       <ContactCTA />
-      
       <Footer />
     </main>
   );

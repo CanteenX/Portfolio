@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   Send,
   Mail,
-  MapPin,
   Phone,
   Loader2,
   CheckCircle2,
@@ -20,6 +19,8 @@ import { CustomSelect } from "@/components/ui/custom-select";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { usePublicSettings } from "@/lib/usePublicAPI";
+import { getPublicSettings, submitContact } from "@/lib/api";
 
 function useLocalTime() {
   const [time, setTime] = useState("");
@@ -40,22 +41,9 @@ function useLocalTime() {
   return time;
 }
 
-const INFO_CARDS = [
-  {
-    icon: Mail,
-    label: "Email",
-    value: "hello@techco.dev",
-    href: "mailto:hello@techco.dev",
-  },
-  {
-    icon: Phone,
-    label: "Phone",
-    value: "+1 (555) 000-1234",
-    href: "tel:+15550001234",
-  },
-];
-
-const SERVICES = [
+const FALLBACK_EMAIL = "hello@techco.dev";
+const FALLBACK_PHONE = "+1 (555) 000-1234";
+const FALLBACK_SERVICES = [
   "App Development",
   "Website Building",
   "CRM Panel",
@@ -65,8 +53,7 @@ const SERVICES = [
   "UI/UX Design",
   "AI Solutions",
 ];
-
-const CALL_SLOTS = [
+const FALLBACK_CALL_SLOTS = [
   "Mon 09 · 3pm",
   "Tue 10 · 11am",
   "Wed 11 · 4pm",
@@ -76,6 +63,18 @@ const CALL_SLOTS = [
 ];
 
 export default function ContactPage() {
+  const { settings } = usePublicSettings(getPublicSettings);
+
+  const email = settings?.contactInfo?.email || FALLBACK_EMAIL;
+  const phone = settings?.contactInfo?.phone || FALLBACK_PHONE;
+  const services = settings?.services?.length ? settings.services : FALLBACK_SERVICES;
+  const callSlots = settings?.callSlots?.length ? settings.callSlots : FALLBACK_CALL_SLOTS;
+
+  const infoCards = [
+    { icon: Mail, label: "Email", value: email, href: `mailto:${email}` },
+    { icon: Phone, label: "Phone", value: phone, href: `tel:${phone.replace(/\s/g, "")}` },
+  ];
+
   const [tab, setTab] = useState<"message" | "call">("call");
   const [formState, setFormState] = useState({
     name: "",
@@ -85,6 +84,7 @@ export default function ContactPage() {
   });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
   const time = useLocalTime();
 
@@ -97,10 +97,16 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setSending(false);
-    setSent(true);
-    setFormState({ name: "", email: "", service: "", message: "" });
+    setSubmitError("");
+    try {
+      await submitContact(formState);
+      setSent(true);
+      setFormState({ name: "", email: "", service: "", message: "" });
+    } catch {
+      setSubmitError("Failed to send. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -142,7 +148,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {INFO_CARDS.map((card) => (
+                  {infoCards.map((card) => (
                     <a
                       key={card.label}
                       href={card.href}
@@ -204,7 +210,7 @@ export default function ContactPage() {
 
             <div className="rounded-[2.5rem] border border-white/5 bg-zinc-950/50 backdrop-blur-sm p-8 md:p-16 relative overflow-hidden min-h-[600px]">
               <div className="absolute top-0 right-0 w-64 h-64 bg-mint/5 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2" />
-              
+
               {tab === "call" ? (
                 <div className="relative z-10 flex flex-col items-center md:items-start">
                    <div className="mb-12 text-center md:text-left">
@@ -217,7 +223,7 @@ export default function ContactPage() {
                   </div>
 
                   <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-3 mb-10">
-                    {CALL_SLOTS.map((slot) => (
+                    {callSlots.map((slot) => (
                       <button
                         key={slot}
                         className="text-[11px] font-mono py-4 border border-white/5 bg-zinc-900/50 rounded-xl hover:border-mint hover:text-mint transition-all text-zinc-400 capitalize"
@@ -315,7 +321,7 @@ export default function ContactPage() {
                         onChange={(val) =>
                           setFormState((prev) => ({ ...prev, service: val }))
                         }
-                        options={SERVICES}
+                        options={services}
                         placeholder="Select a category"
                       />
 
@@ -333,6 +339,10 @@ export default function ContactPage() {
                           className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-mint/30 focus:ring-1 focus:ring-mint/10 transition-all resize-none"
                         />
                       </div>
+
+                      {submitError && (
+                        <p className="text-red-400 text-sm font-mono">{submitError}</p>
+                      )}
 
                       <button
                         type="submit"

@@ -2,28 +2,28 @@
 
 import { Navbar } from "@/components/ui/navbar";
 import { AiModelsList } from "@/components/ui/ai-models-preview";
-import FeatureSection from "@/components/ui/stack-feature-section";
 import { SplineSceneBasic } from "@/components/ui/spline-scene-basic";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import FeatureCarousel from "@/components/ui/feature-carousel";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
-import { Languages, ShoppingCart, HeartPulse, Landmark, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { ContactCTA } from "@/components/ui/contact-cta";
 import { Footer } from "@/components/ui/footer";
+import { usePublicSettings } from "@/lib/usePublicAPI";
+import { getPublicSettings } from "@/lib/api";
 
-const TECH = [
+const FALLBACK_TECH = [
   "AWS", "REACT_NATIVE", "NODE.JS", "GRAPHQL", "POSTGRESQL",
   "TYPESCRIPT", "KUBERNETES", "NEXT.JS", "SWIFT", "KOTLIN",
   "TERRAFORM", "REDIS",
 ];
 
-const projects = [
+const FALLBACK_PROJECTS = [
   {
     title: "We Converse App",
     description: "Meeting app with live translation in any language and automatic minutes of meeting generation.",
     href: "/projects/we-converse",
-    icon: <Languages className="w-5 h-5" />,
     image: "https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1200&q=80",
     eyebrow: "Deployment 01 // Mobile",
   },
@@ -31,7 +31,6 @@ const projects = [
     title: "E-Commerce Solution",
     description: "Full-stack e-commerce platform with AI-driven personalization and recommendations.",
     href: "#",
-    icon: <ShoppingCart className="w-5 h-5" />,
     image: "https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&w=1200&q=80",
     eyebrow: "Deployment 02 // Web",
   },
@@ -39,7 +38,6 @@ const projects = [
     title: "Healthcare Dashboard",
     description: "HIPAA-compliant patient management system with intelligent workflow automation.",
     href: "#",
-    icon: <HeartPulse className="w-5 h-5" />,
     image: "https://images.unsplash.com/photo-1576091160550-2173dad99978?auto=format&fit=crop&w=1200&q=80",
     eyebrow: "Deployment 03 // Dashboard",
   },
@@ -47,13 +45,19 @@ const projects = [
     title: "FinTech App",
     description: "Secure financial application with AI fraud detection and blockchain integration.",
     href: "#",
-    icon: <Landmark className="w-5 h-5" />,
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
     eyebrow: "Deployment 04 // Fintech",
   },
 ];
 
 export default function Home() {
+  const { settings } = usePublicSettings(getPublicSettings);
+
+  const techList = settings?.techMarquee?.length ? settings.techMarquee : FALLBACK_TECH;
+  const featuredProjects = settings?.hero?.featuredProjects?.length
+    ? settings.hero.featuredProjects
+    : FALLBACK_PROJECTS;
+
   return (
     <SmoothScroll>
     <main className="min-h-screen w-full overflow-x-hidden bg-black text-white selection:bg-mint/30">
@@ -70,7 +74,7 @@ export default function Home() {
           <div className="shrink-0 text-mono-tag text-zinc-500">Validated_Stack //</div>
           <div className="flex-1 overflow-hidden relative w-full">
             <div className="flex gap-12 items-center whitespace-nowrap animate-marquee">
-              {[...TECH, ...TECH].map((t, i) => (
+              {[...techList, ...techList].map((t, i) => (
                 <span key={i} className="text-zinc-500 font-mono text-xs tracking-tighter flex items-center gap-2">
                   <span className="size-1 bg-mint inline-block" />
                   {t}
@@ -79,8 +83,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        
-        {/* Marquee Animation */}
+
         <style jsx global>{`
           @keyframes marquee {
             0% { transform: translateX(0); }
@@ -108,26 +111,20 @@ export default function Home() {
           </ScrollReveal>
 
           <div className="grid md:grid-cols-2 gap-px bg-white/5 border border-white/10 overflow-hidden rounded-3xl">
-            {projects.map((project, index) => (
+            {featuredProjects.map((project, index) => (
               <ScrollReveal key={index} delay={index * 0.1} direction="up">
                 <Link
                   href={project.href}
                   className="group relative block aspect-[16/10] overflow-hidden bg-zinc-900"
                 >
-                  {/* Related background image */}
                   <img
                     src={project.image}
                     alt={project.title}
                     className="absolute inset-0 w-full h-full object-cover transition-all duration-700 opacity-40 group-hover:opacity-60 group-hover:scale-105"
                   />
-                  
-                  {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-                  
-                  {/* Content Overlay */}
                   <div className="absolute inset-0 p-8 flex flex-col justify-between">
                     <div>
-                      {/* Project Title in Green on Top */}
                       <div className="text-mono-tag text-mint font-bold tracking-widest drop-shadow-sm mb-4">
                         {project.eyebrow}
                       </div>
@@ -138,7 +135,6 @@ export default function Home() {
                         {project.description}
                       </p>
                     </div>
-                    
                     <div className="flex items-center gap-2 text-mono-tag text-mint opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500">
                       View Project <ArrowRight className="w-3 h-3" />
                     </div>
@@ -170,27 +166,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Tech Stack Section (Commented out)
-      <section id="tech-stack" className="py-16 px-4 bg-black border-t border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <ScrollReveal direction="up">
-            <div className="text-center mb-16">
-              <h2 className="mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 lowercase">
-                Technology Stack.
-              </h2>
-              <p className="text-zinc-500 max-w-2xl mx-auto">
-                Building with modern frameworks and tools for scalable, performant applications
-              </p>
-            </div>
-          </ScrollReveal>
-
-          <ScrollReveal delay={0.2} direction="up">
-            <FeatureSection />
-          </ScrollReveal>
-        </div>
-      </section>
-      */}
-
       {/* AI LLM Services Section */}
       <section id="ai-solutions" className="py-16 px-4 bg-zinc-950/20 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
@@ -212,7 +187,6 @@ export default function Home() {
       </section>
 
       <ContactCTA />
-      {/* Footer */}
       <Footer />
     </main>
     </SmoothScroll>

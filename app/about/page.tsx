@@ -4,11 +4,45 @@ import { Navbar } from "@/components/ui/navbar";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { Eye, Target, Zap, Shield, Users, Globe, ArrowRight } from "lucide-react";
+import type { ElementType } from "react";
 import { GlobePulse } from "@/components/ui/cobe-globe-pulse";
 import { ContactCTA } from "@/components/ui/contact-cta";
 import { Footer } from "@/components/ui/footer";
+import { usePublicSettings } from "@/lib/usePublicAPI";
+import { getPublicSettings } from "@/lib/api";
+
+const ICON_MAP: Record<string, ElementType> = {
+  Zap, Shield, Users, Globe, Target, ArrowRight, Eye,
+};
+
+const FALLBACK_VISION =
+  "To be the catalyst for the next generation of digital experiences, where AI and human creativity merge to solve the world's most complex challenges.";
+
+const FALLBACK_MISSION =
+  "Empowering businesses with cutting-edge full-stack solutions and intelligent AI systems. We transform ideas into robust, scalable, and beautiful realities.";
+
+const FALLBACK_VALUES = [
+  { icon: "Zap", title: "Innovation", desc: "Constant exploration of emerging technologies to stay ahead of the curve." },
+  { icon: "Shield", title: "Integrity", desc: "Unwavering commitment to security, privacy, and ethical development." },
+  { icon: "Users", title: "Collaboration", desc: "Working as an extension of your team to ensure mutual success." },
+  { icon: "Globe", title: "Impact", desc: "Building solutions that make a meaningful difference on a global scale." },
+  { icon: "Target", title: "Excellence", desc: "Meticulous attention to detail in every line of code and every pixel." },
+  { icon: "ArrowRight", title: "Agility", desc: "Rapid adaptation to evolving requirements and market dynamics." },
+];
+
+const FALLBACK_STATS = [
+  { label: "Projects Delivered", value: "50+" },
+  { label: "Success Rate", value: "98%" },
+];
 
 export default function AboutPage() {
+  const { settings } = usePublicSettings(getPublicSettings);
+
+  const vision = settings?.about?.vision || FALLBACK_VISION;
+  const mission = settings?.about?.mission || FALLBACK_MISSION;
+  const values = settings?.about?.values?.length ? settings.about.values : FALLBACK_VALUES;
+  const stats = settings?.about?.stats?.length ? settings.about.stats : FALLBACK_STATS;
+
   return (
     <SmoothScroll>
       <main className="min-h-screen w-full bg-black text-white selection:bg-mint/30">
@@ -31,9 +65,9 @@ export default function AboutPage() {
 
             <ScrollReveal direction="up" delay={0.2}>
               <div className="w-full aspect-[21/9] bg-zinc-900 border border-white/10 rounded-[3rem] flex items-center justify-center group overflow-hidden relative shadow-2xl">
-                <img 
-                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2000&q=80" 
-                  alt="Our Team" 
+                <img
+                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2000&q=80"
+                  alt="Our Team"
                   className="absolute inset-0 w-full h-full object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-1000 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
@@ -54,9 +88,7 @@ export default function AboutPage() {
                   <Eye className="text-black w-7 h-7" />
                 </div>
                 <h2 className="text-4xl font-bold mb-6 tracking-tight">Our Vision</h2>
-                <p className="text-zinc-400 text-lg leading-relaxed flex-grow">
-                  To be the catalyst for the next generation of digital experiences, where AI and human creativity merge to solve the world's most complex challenges.
-                </p>
+                <p className="text-zinc-400 text-lg leading-relaxed flex-grow">{vision}</p>
               </div>
             </ScrollReveal>
 
@@ -66,9 +98,7 @@ export default function AboutPage() {
                   <Target className="text-mint w-7 h-7" />
                 </div>
                 <h2 className="text-4xl font-bold mb-6 tracking-tight text-mint">Our Mission</h2>
-                <p className="text-zinc-400 text-lg leading-relaxed flex-grow">
-                  Empowering businesses with cutting-edge full-stack solutions and intelligent AI systems. We transform ideas into robust, scalable, and beautiful realities.
-                </p>
+                <p className="text-zinc-400 text-lg leading-relaxed flex-grow">{mission}</p>
               </div>
             </ScrollReveal>
           </div>
@@ -85,24 +115,20 @@ export default function AboutPage() {
             </ScrollReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { icon: Zap, title: "Innovation", desc: "Constant exploration of emerging technologies to stay ahead of the curve." },
-                { icon: Shield, title: "Integrity", desc: "Unwavering commitment to security, privacy, and ethical development." },
-                { icon: Users, title: "Collaboration", desc: "Working as an extension of your team to ensure mutual success." },
-                { icon: Globe, title: "Impact", desc: "Building solutions that make a meaningful difference on a global scale." },
-                { icon: Target, title: "Excellence", desc: "Meticulous attention to detail in every line of code and every pixel." },
-                { icon: ArrowRight, title: "Agility", desc: "Rapid adaptation to evolving requirements and market dynamics." },
-              ].map((value, idx) => (
-                <ScrollReveal key={idx} delay={idx * 0.05} direction="up">
-                  <div className="p-10 rounded-3xl border border-white/5 bg-zinc-900/30 hover:border-mint/30 transition-all duration-500 group">
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/10 w-fit mb-8 group-hover:scale-110 transition-transform">
-                      <value.icon className="w-6 h-6 text-mint" />
+              {values.map((value, idx) => {
+                const Icon = ICON_MAP[value.icon] || Zap;
+                return (
+                  <ScrollReveal key={idx} delay={idx * 0.05} direction="up">
+                    <div className="p-10 rounded-3xl border border-white/5 bg-zinc-900/30 hover:border-mint/30 transition-all duration-500 group">
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10 w-fit mb-8 group-hover:scale-110 transition-transform">
+                        <Icon className="w-6 h-6 text-mint" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-4">{value.title}</h3>
+                      <p className="text-zinc-500 leading-relaxed text-sm">{value.desc}</p>
                     </div>
-                    <h3 className="text-xl font-bold mb-4">{value.title}</h3>
-                    <p className="text-zinc-500 leading-relaxed text-sm">{value.desc}</p>
-                  </div>
-                </ScrollReveal>
-              ))}
+                  </ScrollReveal>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -117,16 +143,14 @@ export default function AboutPage() {
                 <p className="text-zinc-400 text-lg mb-12 max-w-xl leading-relaxed font-light">
                   We've built solutions for visionary companies across 4 continents. Our code powers businesses from Silicon Valley to Singapore.
                 </p>
-                
+
                 <div className="grid grid-cols-2 gap-10">
-                  <div className="space-y-1">
-                    <h4 className="text-4xl font-bold text-white tabular-nums">50+</h4>
-                    <p className="text-mint font-mono text-[10px] uppercase tracking-[0.25em]">Projects Delivered</p>
-                  </div>
-                  <div className="space-y-1">
-                    <h4 className="text-4xl font-bold text-white tabular-nums">98%</h4>
-                    <p className="text-mint font-mono text-[10px] uppercase tracking-[0.25em]">Success Rate</p>
-                  </div>
+                  {stats.map((stat, i) => (
+                    <div key={i} className="space-y-1">
+                      <h4 className="text-4xl font-bold text-white tabular-nums">{stat.value}</h4>
+                      <p className="text-mint font-mono text-[10px] uppercase tracking-[0.25em]">{stat.label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </ScrollReveal>

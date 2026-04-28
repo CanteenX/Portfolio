@@ -1,7 +1,11 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { PROJECTS, getProject } from "@/lib/projects";
+import { getPublicProjectBySlug } from "@/lib/api";
+import type { ApiProject } from "@/lib/api";
+import type { Project } from "@/lib/projects";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
@@ -11,7 +15,25 @@ import { ContactCTA } from "@/components/ui/contact-cta";
 
 export default function ProjectDetailsPage() {
   const { slug } = useParams();
-  const project = getProject(slug as string);
+  const [project, setProject] = useState<Project | ApiProject | null | undefined>(undefined);
+
+  useEffect(() => {
+    getPublicProjectBySlug(slug as string)
+      .then((data) => {
+        setProject(data ?? getProject(slug as string) ?? null);
+      })
+      .catch(() => {
+        setProject(getProject(slug as string) ?? null);
+      });
+  }, [slug]);
+
+  if (project === undefined) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!project) {
     return (
@@ -31,14 +53,14 @@ export default function ProjectDetailsPage() {
         <section className="relative pt-32 pb-20 px-4 overflow-hidden border-b border-white/5">
           <div className="max-w-7xl mx-auto relative z-10">
             <ScrollReveal direction="up">
-              <button 
+              <button
                 onClick={() => window.history.back()}
                 className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors mb-8 group font-mono text-xs uppercase tracking-widest"
               >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 Back to Work
               </button>
-              
+
               <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
                 <div className="max-w-3xl">
                   <div className="flex items-center gap-3 mb-6">
@@ -66,9 +88,9 @@ export default function ProjectDetailsPage() {
 
             <ScrollReveal direction="up" delay={0.2}>
               <div className="relative aspect-[21/9] w-full rounded-3xl overflow-hidden border border-white/10">
-                <img 
-                  src={project.image} 
-                  alt={project.title} 
+                <img
+                  src={project.image}
+                  alt={project.title}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
@@ -216,9 +238,9 @@ export default function ProjectDetailsPage() {
                 <ScrollReveal key={i} direction="up" delay={i * 0.1}>
                   <div className="group space-y-4">
                     <div className="relative aspect-video rounded-3xl overflow-hidden border border-white/5">
-                      <img 
-                        src={item.src} 
-                        alt={item.caption} 
+                      <img
+                        src={item.src}
+                        alt={item.caption}
                         className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-105 hover:scale-100"
                       />
                     </div>
@@ -232,9 +254,7 @@ export default function ProjectDetailsPage() {
           </div>
         </section>
 
-        {/* CTA */}
         <ContactCTA />
-
         <Footer />
       </main>
     </SmoothScroll>

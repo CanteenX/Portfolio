@@ -7,17 +7,20 @@ import { Footer } from "@/components/ui/footer";
 import { PROJECTS } from "@/lib/projects";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
+import { usePublicAPI } from "@/lib/usePublicAPI";
+import { getPublicProjects } from "@/lib/api";
 
 const FILTERS = ["All", "Native Mobile", "Web Apps", "Backend/Cloud"] as const;
 
 export default function WorkPage() {
   const [filter, setFilter] = useState<typeof FILTERS[number]>("All");
-  const filtered = filter === "All" ? PROJECTS : PROJECTS.filter((p) => p.category === filter);
+  const { data: projects } = usePublicAPI(getPublicProjects, PROJECTS);
+  const filtered = filter === "All" ? projects : projects.filter((p) => p.category === filter);
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-mint/30">
       <Navbar />
-      
+
       <div className="pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto">
           <ScrollReveal direction="up">
@@ -34,8 +37,8 @@ export default function WorkPage() {
                   key={f}
                   onClick={() => setFilter(f)}
                   className={`text-mono-tag px-6 py-2.5 transition-all duration-300 rounded-md ${
-                    filter === f 
-                      ? "bg-mint text-black font-bold shadow-[0_0_15px_rgba(0,255,163,0.3)]" 
+                    filter === f
+                      ? "bg-mint text-black font-bold shadow-[0_0_15px_rgba(0,255,163,0.3)]"
                       : "text-zinc-500 hover:text-white hover:bg-white/5"
                   }`}
                 >
@@ -52,20 +55,20 @@ export default function WorkPage() {
                   href={`/projects/${p.slug}`}
                   className="group relative block aspect-[16/10] overflow-hidden bg-zinc-900 border-r border-b border-white/5 last:border-r-0"
                 >
-                  <img 
-                    src={p.image} 
-                    alt={p.title} 
-                    loading="lazy" 
-                    className="absolute inset-0 w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-1000 opacity-40 group-hover:opacity-80 group-hover:scale-105" 
+                  <img
+                    src={p.image}
+                    alt={p.title}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-1000 opacity-40 group-hover:opacity-80 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                  
+
                   <div className="absolute inset-0 p-10 flex flex-col justify-between">
                     <div className="flex justify-between text-mono-tag items-center">
                       <span className="text-mint bg-mint/10 px-2 py-1 rounded border border-mint/20">{p.category}</span>
                       <span className="text-zinc-500">{p.year}</span>
                     </div>
-                    
+
                     <div className="relative">
                       <h3 className="mb-2 group-hover:text-mint transition-colors">
                         {p.title}
@@ -81,7 +84,7 @@ export default function WorkPage() {
           </div>
         </div>
       </div>
-      
+
       <ContactCTA />
       <Footer />
     </main>

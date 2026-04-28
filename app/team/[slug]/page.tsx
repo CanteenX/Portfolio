@@ -1,43 +1,72 @@
 "use client";
 
-import React, { use } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 import { getMember, splitName, personnelRef, TEAM } from "@/lib/team";
+import { getPublicMemberBySlug, getPublicTeam } from "@/lib/api";
+import type { ApiMember } from "@/lib/api";
+import type { Member } from "@/lib/team";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { 
-  ArrowLeft, 
-  Mail, 
-  Globe, 
-  ShieldCheck, 
-  MapPin, 
+import {
+  ArrowLeft,
+  Mail,
+  Globe,
+  MapPin,
   Languages,
-  ExternalLink 
+  ExternalLink
 } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
 
-export default function MemberPage({ params }: { params: Promise<{ slug: string }> }) {
-  const resolvedParams = use(params);
-  const member = getMember(resolvedParams.slug);
+export default function MemberPage() {
+  const { slug } = useParams();
+  const [member, setMember] = useState<Member | ApiMember | null | undefined>(undefined);
+  const [allMembers, setAllMembers] = useState<(Member | ApiMember)[]>(TEAM);
+
+  useEffect(() => {
+    Promise.all([
+      getPublicMemberBySlug(slug as string),
+      getPublicTeam(),
+    ])
+      .then(([memberData, teamData]) => {
+        setMember(memberData ?? getMember(slug as string) ?? null);
+        setAllMembers(teamData.length > 0 ? teamData : TEAM);
+      })
+      .catch(() => {
+        setMember(getMember(slug as string) ?? null);
+        setAllMembers(TEAM);
+      });
+  }, [slug]);
+
+  if (member === undefined) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-mint border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!member) {
-    return notFound();
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
+        <h1 className="text-4xl font-bold mb-4">Member Not Found</h1>
+        <a href="/team" className="text-mint hover:underline">Back to Team</a>
+      </div>
+    );
   }
 
   const { first, last } = splitName(member.name);
-
-  // Next member for "next dossier" footer link
-  const idx = TEAM.findIndex((m) => m.slug === member.slug);
-  const nextMember = TEAM[(idx + 1) % TEAM.length];
+  const idx = allMembers.findIndex((m) => m.slug === member.slug);
+  const nextMember = allMembers[(idx + 1) % allMembers.length];
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden selection:bg-mint/30">
       <Navbar />
 
-      {/* Ambient glow - adapted for combined theme */}
+      {/* Ambient glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute top-0 right-0 h-[800px] w-[800px] rounded-full opacity-20 blur-[120px]"
@@ -240,20 +269,22 @@ export default function MemberPage({ params }: { params: Promise<{ slug: string 
               </section>
 
               {/* Next dossier */}
-              <ScrollReveal direction="up">
-                <section className="pt-16 border-t border-white/10">
-                  <Link
-                    href={`/team/${nextMember.slug}`}
-                    className="group block bg-zinc-900/30 p-10 rounded-[40px] border border-white/5 hover:border-mint/30 transition-all duration-500"
-                  >
-                    <div className="text-mono-tag text-gray-500 mb-4">Next dossier →</div>
-                    <div className="text-4xl md:text-6xl font-bold tracking-tighter group-hover:text-mint transition-all duration-500">
-                      {nextMember.name}
-                    </div>
-                    <div className="text-lg text-gray-400 mt-2">{nextMember.role}</div>
-                  </Link>
-                </section>
-              </ScrollReveal>
+              {nextMember && (
+                <ScrollReveal direction="up">
+                  <section className="pt-16 border-t border-white/10">
+                    <Link
+                      href={`/team/${nextMember.slug}`}
+                      className="group block bg-zinc-900/30 p-10 rounded-[40px] border border-white/5 hover:border-mint/30 transition-all duration-500"
+                    >
+                      <div className="text-mono-tag text-gray-500 mb-4">Next dossier →</div>
+                      <div className="text-4xl md:text-6xl font-bold tracking-tighter group-hover:text-mint transition-all duration-500">
+                        {nextMember.name}
+                      </div>
+                      <div className="text-lg text-gray-400 mt-2">{nextMember.role}</div>
+                    </Link>
+                  </section>
+                </ScrollReveal>
+              )}
             </div>
           </div>
         </div>

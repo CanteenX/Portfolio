@@ -2,9 +2,26 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePublicSettings } from "@/lib/usePublicAPI";
+import { getPublicSettings } from "@/lib/api";
+
+const FALLBACK_BRAND = "FORGE_COLLECTIVE";
+const FALLBACK_LINKS = [
+  { label: "Work", href: "/projects" },
+  { label: "Process", href: "/how-we-work" },
+  { label: "Team", href: "/team" },
+];
+const FALLBACK_CTA = { label: "Let's Talk", href: "/contact" };
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { settings } = usePublicSettings(getPublicSettings);
+
+  const brandName = settings?.navbar?.brandName || FALLBACK_BRAND;
+  const navLinks = settings?.navbar?.links?.length ? settings.navbar.links.slice(0, -1) : FALLBACK_LINKS;
+  const ctaLink = settings?.navbar?.links?.length
+    ? settings.navbar.links[settings.navbar.links.length - 1]
+    : FALLBACK_CTA;
 
   return (
     <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-4xl">
@@ -15,19 +32,19 @@ export function Navbar() {
           {/* Logo */}
           <a href="/" className="font-mono font-medium tracking-tighter text-sm flex items-center gap-2 text-white">
             <div className="size-2.5 bg-mint inline-block" aria-hidden />
-            <span>FORGE_COLLECTIVE</span>
+            <span>{brandName}</span>
           </a>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8 text-mono-tag">
-            <NavLink href="/projects" label="Work" />
-            <NavLink href="/how-we-work" label="Process" />
-            <NavLink href="/team" label="Team" />
+            {navLinks.map((link) => (
+              <NavLink key={link.href} href={link.href} label={link.label} />
+            ))}
             <Link
-              href="/contact"
+              href={ctaLink.href}
               className="bg-white text-black px-4 py-2 hover:bg-mint transition-colors"
             >
-              Let's Talk
+              {ctaLink.label}
             </Link>
           </div>
 
@@ -51,10 +68,9 @@ export function Navbar() {
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-zinc-800/95 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
             <div className="flex flex-col py-4 px-6 space-y-2">
-              <MobileNavLink href="/projects" label="Work" onClick={() => setMobileMenuOpen(false)} />
-              <MobileNavLink href="/how-we-work" label="Process" onClick={() => setMobileMenuOpen(false)} />
-              <MobileNavLink href="/team" label="Team" onClick={() => setMobileMenuOpen(false)} />
-              <MobileNavLink href="/contact" label="Let's Talk" onClick={() => setMobileMenuOpen(false)} />
+              {[...navLinks, ctaLink].map((link) => (
+                <MobileNavLink key={link.href} href={link.href} label={link.label} onClick={() => setMobileMenuOpen(false)} />
+              ))}
             </div>
           </div>
         )}
@@ -65,10 +81,7 @@ export function Navbar() {
 
 function NavLink({ href, label }: { href: string; label: string }) {
   return (
-    <a
-      href={href}
-      className="text-zinc-500 hover:text-white transition-colors"
-    >
+    <a href={href} className="text-zinc-500 hover:text-white transition-colors">
       {label}
     </a>
   );
