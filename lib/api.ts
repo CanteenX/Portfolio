@@ -2,13 +2,54 @@ import axios from "axios";
 import type { Project } from "./projects";
 import type { Member } from "./team";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002";
+
+export function resolveImageUrl(path: string | undefined | null): string {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+  return `${API_URL}${path}`;
+}
 
 export const apiClient = axios.create({ baseURL: API_URL, timeout: 10000 });
 
 // ── Types matching server responses ──────────────────────────────────────────
 
-export type ApiProject = Project & { _id: string };
+export type RoiItem = { value: string; label: string; description: string; icon: string };
+export type Screen = { label: string; caption: string; description: string; image: string };
+export type WorkflowStep = { step: string; title: string; description: string };
+
+export type ApiProject = {
+  _id: string;
+  slug: string;
+  title: string;
+  category: string;
+  metric: string;
+  year: string;
+  image: string;
+  client: string;
+  timeframe: string;
+  role: string;
+  stack: string[];
+  techStack: string[];
+  liveUrl?: string;
+  githubUrl?: string;
+  problem: string;
+  solution: string;
+  features: { title: string; description: string }[];
+  gallery: { src: string; caption: string }[];
+  roi: RoiItem[];
+  roiSectionDescription: string;
+  screens: Screen[];
+  workflowSteps: WorkflowStep[];
+  stackSectionDescription: string;
+  codeSnippet?: { language: string; label: string; code: string };
+  architecture?: string;
+  isActive: boolean;
+  order: number;
+};
+
+export type ApiTechStack = { _id: string; name: string; image: string; description: string; isActive: boolean; order: number };
+
 export type ApiMember = Member & { _id: string };
 
 export type PortfolioSettings = {
@@ -48,9 +89,54 @@ export type ContactFormData = {
 
 // ── API functions ─────────────────────────────────────────────────────────────
 
+export type ProjectListParams = {
+  page?: number;
+  limit?: number;
+  category?: string;
+  year?: string;
+  client?: string;
+  stack?: string[];
+  search?: string;
+};
+
+export type ProjectListResult = {
+  items: ApiProject[];
+  page: number;
+  limit: number;
+  total: number;
+};
+
 export async function getPublicProjects(): Promise<ApiProject[]> {
   const { data } = await apiClient.get<{ items: ApiProject[] }>("/api/v1/public/portfolio/projects");
   return data.items ?? [];
+}
+
+export async function getPublicProjectsByParams(params: ProjectListParams = {}): Promise<ProjectListResult> {
+  const { data } = await apiClient.get<ProjectListResult>("/api/v1/public/portfolio/projects/listbyparams", {
+    params: {
+      ...params,
+      stack: params.stack?.join(",") || undefined
+    }
+  });
+  return data;
+}
+
+export async function getPublicTechStacks(): Promise<ApiTechStack[]> {
+  try {
+    const { data } = await apiClient.get<{ items: ApiTechStack[] }>("/api/v1/public/portfolio/tech-stacks");
+    return data.items ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getPublicCategories(): Promise<string[]> {
+  try {
+    const { data } = await apiClient.get<{ items: { name: string }[] }>("/api/v1/public/portfolio/categories");
+    return data.items.map((c) => c.name);
+  } catch {
+    return [];
+  }
 }
 
 export async function getPublicProjectBySlug(slug: string): Promise<ApiProject | null> {

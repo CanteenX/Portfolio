@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
 import { usePublicAPI, usePublicSettings } from "@/lib/usePublicAPI";
-import { getPublicTeam, getPublicSettings } from "@/lib/api";
+import { getPublicTeam, getPublicSettings, resolveImageUrl } from "@/lib/api";
 
 const FALLBACK_PLAYBOOK = [
   { phase: "01", name: "Discovery", body: "1-week deep dive: scope, success metrics, architecture sketch." },
@@ -43,7 +43,7 @@ export default function TeamPage() {
                 >
                   <div className="aspect-[4/5] overflow-hidden bg-zinc-950 relative">
                     <img
-                      src={p.avatar}
+                      src={resolveImageUrl(p.avatar)}
                       alt={p.name}
                       loading="lazy"
                       className="w-full h-full object-cover grayscale contrast-110 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
