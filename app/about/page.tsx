@@ -6,6 +6,7 @@ import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { Eye, Target, Zap, Shield, Users, Globe, ArrowRight } from "lucide-react";
 import type { ElementType } from "react";
 import { GlobePulse } from "@/components/ui/cobe-globe-pulse";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { ContactCTA } from "@/components/ui/contact-cta";
 import { Footer } from "@/components/ui/footer";
 import { usePublicSettings } from "@/lib/usePublicAPI";
@@ -146,10 +147,7 @@ export default function AboutPage() {
 
                 <div className="grid grid-cols-2 gap-10">
                   {stats.map((stat, i) => (
-                    <div key={i} className="space-y-1">
-                      <h4 className="text-4xl font-bold text-white tabular-nums">{stat.value}</h4>
-                      <p className="text-mint font-mono text-[10px] uppercase tracking-[0.25em]">{stat.label}</p>
-                    </div>
+                    <AnimatedCounter key={i} value={stat.value} label={stat.label} />
                   ))}
                 </div>
               </div>

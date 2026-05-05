@@ -5,9 +5,10 @@ import { useState } from "react";
 import { usePublicSettings } from "@/lib/usePublicAPI";
 import { getPublicSettings } from "@/lib/api";
 
-const FALLBACK_BRAND = "FORGE_COLLECTIVE";
+const FALLBACK_BRAND = "NVENTRA";
 const FALLBACK_LINKS = [
   { label: "Work", href: "/projects" },
+  { label: "Services", href: "/services" },
   { label: "Process", href: "/how-we-work" },
   { label: "Team", href: "/team" },
 ];
@@ -36,13 +37,13 @@ export function Navbar() {
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8 text-mono-tag">
+          <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <NavLink key={link.href} href={link.href} label={link.label} />
             ))}
             <Link
               href={ctaLink.href}
-              className="bg-white text-black px-4 py-2 hover:bg-mint transition-colors"
+              className="bg-white text-black text-xs font-bold px-4 py-2 hover:bg-mint transition-colors tracking-widest uppercase"
             >
               {ctaLink.label}
             </Link>
@@ -81,7 +82,7 @@ export function Navbar() {
 
 function NavLink({ href, label }: { href: string; label: string }) {
   return (
-    <a href={href} className="text-zinc-500 hover:text-white transition-colors">
+    <a href={href} className="text-xs font-medium text-zinc-200 hover:text-white tracking-wide transition-colors">
       {label}
     </a>
   );

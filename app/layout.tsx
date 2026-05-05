@@ -8,8 +8,19 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "TechCo - AI & Full-Stack Development",
-  description: "Cutting-edge AI and full-stack development solutions that transform ideas into reality.",
+  title: "Nventra — High-Performance Web & Mobile Engineering",
+  description: "Nventra is an elite engineering collective building scalable web and mobile products for global brands.",
+  openGraph: {
+    title: "Nventra — High-Performance Web & Mobile Engineering",
+    description: "Nventra is an elite engineering collective building scalable web and mobile products for global brands.",
+    type: "website",
+    siteName: "Nventra",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Nventra — High-Performance Web & Mobile Engineering",
+    description: "Nventra is an elite engineering collective building scalable web and mobile products for global brands.",
+  },
 };
 
 export default function RootLayout({

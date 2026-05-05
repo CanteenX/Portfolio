@@ -41,8 +41,8 @@ function useLocalTime() {
   return time;
 }
 
-const FALLBACK_EMAIL = "hello@techco.dev";
-const FALLBACK_PHONE = "+1 (555) 000-1234";
+const FALLBACK_EMAIL = "deepmenta081@gmail.com";
+const FALLBACK_PHONE = "+91 (xxx) xxx-xxxx";
 const FALLBACK_SERVICES = [
   "App Development",
   "Website Building",

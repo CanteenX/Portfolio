@@ -139,6 +139,20 @@ export default function ProjectDetailsPage() {
       <main className="min-h-screen w-full bg-black text-white selection:bg-white/20">
         <Navbar />
 
+        {/* Glassmorphism page header */}
+        <div className="relative h-64 md:h-80 w-full overflow-hidden bg-zinc-950">
+          {project.image && (
+            <img src={resolveImageUrl(project.image)} alt={project.title} className="absolute inset-0 w-full h-full object-cover opacity-20" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
+          <div className="absolute inset-x-0 bottom-0 px-6 md:px-12 pb-10">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-mono-tag text-mint mb-3">{project.category ?? "Project"}</div>
+              <h1 className="text-4xl md:text-6xl font-semibold tracking-tighter text-white">{project.title}</h1>
+            </div>
+          </div>
+        </div>
+
         {/* ── HERO ── */}
         <section className="pt-28 pb-16 px-6">
           <div className="max-w-7xl mx-auto">
