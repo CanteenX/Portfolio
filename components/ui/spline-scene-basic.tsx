@@ -13,9 +13,9 @@ export function SplineSceneBasic() {
 
       <div className="flex h-full flex-col md:flex-row">
         {/* Left content — starts below the fixed navbar */}
-        <div className="flex-1 px-12 md:px-24 pt-28 md:pt-24 relative z-10 flex flex-col justify-center pb-16">
+        <div className="flex-1 px-12 md:px-24 pt-40 md:pt-48 relative z-10 flex flex-col justify-start pb-16">
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tighter leading-[0.88] bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400">
-            We Engineer <span className="text-emerald-500 italic">High-Performance</span> Web &amp; Mobile Products
+            We Engineer <span className="text-emerald-500 italic">High-Performance</span> <br/>Web &amp; Mobile Products
           </h1>
           <p className="mt-8 text-neutral-400 text-base md:text-lg max-w-xl leading-relaxed font-light">
             An elite engineering collective transforming complex problems into elegant production-grade software.

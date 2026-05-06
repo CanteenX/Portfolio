@@ -16,7 +16,7 @@ export function ContactCTA() {
             <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
               <div>
                 <div className="text-mono-tag text-mint mb-4">Initialize // Connection</div>
-                <h2 className="text-4xl md:text-5xl font-medium tracking-tighter mb-4 max-w-xl lowercase leading-none">
+                <h2 className="text-4xl md:text-5xl font-medium tracking-tighter mb-4 max-w-xl capitalize leading-none">
                   Have a high-stakes product to ship?
                 </h2>
                 <p className="text-zinc-500 max-w-lg">

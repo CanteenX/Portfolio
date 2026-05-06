@@ -42,7 +42,7 @@ function useLocalTime() {
 }
 
 const FALLBACK_EMAIL = "deepmenta081@gmail.com";
-const FALLBACK_PHONE = "+91 (xxx) xxx-xxxx";
+const FALLBACK_PHONE = "9173694508";
 const FALLBACK_SERVICES = [
   "App Development",
   "Website Building",
@@ -157,11 +157,11 @@ export default function ContactPage() {
                       <div className="p-2 rounded-lg bg-white/5 border border-white/10 shrink-0">
                         <card.icon size={18} className="text-mint" />
                       </div>
-                      <div className="text-left">
+                      <div className="text-left overflow-hidden min-w-0">
                         <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-1">
                           {card.label}
                         </p>
-                        <p className="text-sm text-zinc-300 font-medium whitespace-nowrap">
+                        <p className="text-sm text-zinc-300 font-medium truncate">
                           {card.value}
                         </p>
                       </div>
