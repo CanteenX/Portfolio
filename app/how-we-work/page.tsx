@@ -148,13 +148,13 @@ export default function HowWeWork() {
                   <a
                     key={p.id}
                     href={`#${p.id}`}
-                    className={`block py-3 px-6 border-l-2 -ml-px text-xs tracking-tight transition-all duration-300 ${
+                    className={`block py-3 px-6 border-l-2 -ml-px text-base tracking-tight transition-all duration-300 ${
                       activeSegment === p.id
                         ? "border-mint text-mint font-bold translate-x-1"
                         : "border-transparent text-zinc-500 hover:text-zinc-300"
                     }`}
                   >
-                    <span className="font-mono text-[10px] mr-3 opacity-50">{p.n}</span>
+                    <span className="font-mono text-sm mr-3 opacity-50">{p.n}</span>
                     {p.title.toUpperCase()}
                   </a>
                 ))}
@@ -184,7 +184,7 @@ export default function HowWeWork() {
                           <div className={`absolute inset-0 bg-gradient-to-br ${item.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
 
                           <div className="relative">
-                            <span className="text-xs font-bold text-zinc-600 tracking-widest uppercase mb-4 block">Step {item.n} // Status: Operational</span>
+                            <span className="text-sm font-bold text-zinc-600 tracking-widest uppercase mb-4 block">Step {item.n} // Status: Operational</span>
                             <h2 className="text-3xl md:text-4xl font-bold mb-6">{item.title}</h2>
                             <p className="text-lg text-zinc-400 leading-relaxed max-w-2xl">{item.description}</p>
                           </div>
@@ -199,16 +199,15 @@ export default function HowWeWork() {
               <section id="why-us" className="scroll-mt-40">
                 <ScrollReveal direction="up">
                   <div className="text-center mb-16">
-                    <h2 className="lowercase">Why Build With Us</h2>
+                    <h2>Why Build With Us</h2>
                     <p className="text-zinc-500">Battle-tested commitment to excellence.</p>
                   </div>
 
                   <div className="grid md:grid-cols-3 gap-5">
                     {perks.map((perk, i) => (
                       <div key={i} className={`p-8 bg-zinc-900/40 border border-white/5 rounded-3xl group transition-all duration-500 ${perk.border}`}>
-                        <div className="text-4xl mb-6">{perk.icon}</div>
                         <h3 className="text-xl font-bold mb-3">{perk.title}</h3>
-                        <p className="text-sm text-zinc-500 leading-relaxed">{perk.description}</p>
+                        <p className="text-base text-zinc-500 leading-relaxed">{perk.description}</p>
                       </div>
                     ))}
                   </div>

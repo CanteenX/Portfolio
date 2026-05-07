@@ -73,12 +73,12 @@ export default function Home() {
       {/* Validated Stack Banner */}
       <section className="border-y border-white/5 bg-zinc-950/40 relative overflow-hidden">
         <div className="max-w-7xl mx-auto py-8 px-6 flex flex-col md:flex-row items-center gap-8">
-          <div className="shrink-0 text-mono-tag text-zinc-500">Validated_Stack //</div>
+          <div className="shrink-0 text-xs uppercase tracking-widest text-zinc-500 font-bold">Validated Stack //</div>
           <div className="flex-1 overflow-hidden relative w-full">
             <div className="flex gap-12 items-center whitespace-nowrap animate-marquee">
               {[...techList, ...techList].map((t, i) => (
-                <span key={i} className="text-zinc-500 font-mono text-xs tracking-tighter flex items-center gap-2">
-                  <span className="size-1 bg-mint inline-block" />
+                <span key={i} className="text-zinc-400 text-base font-medium flex items-center gap-2">
+                  <span className="size-1.5 bg-mint inline-block rounded-full" />
                   {t}
                 </span>
               ))}
@@ -103,7 +103,7 @@ export default function Home() {
           <ScrollReveal direction="up">
             <div className="flex items-end justify-between mb-12">
               <div>
-                <div className="text-mono-tag text-mint mb-3">Our_Projects //</div>
+                <div className="text-xs font-mono tracking-[0.2em] uppercase text-mint mb-3 font-semibold">Our_Projects //</div>
                 <h2 className="tracking-tight">Recent deployments.</h2>
               </div>
               <Link href="/work" className="hidden md:inline-block text-mono-tag text-zinc-500 hover:text-mint transition-colors">

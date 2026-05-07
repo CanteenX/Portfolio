@@ -123,7 +123,7 @@ export default function ServicesPage() {
                         {service.title}
                       </h3>
                       {service.description && (
-                        <p className="text-zinc-400 text-sm leading-relaxed font-light">
+                        <p className="text-zinc-400 text-base leading-relaxed font-light">
                           {service.description}
                         </p>
                       )}

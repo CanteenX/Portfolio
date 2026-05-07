@@ -214,9 +214,7 @@ export default function ContactPage() {
               {tab === "call" ? (
                 <div className="relative z-10 flex flex-col items-center md:items-start">
                    <div className="mb-12 text-center md:text-left">
-                    <h2 className="tracking-tight lowercase mb-3">
-                      Discovery Call.
-                    </h2>
+                    <h2 className="tracking-tight mb-3">Discovery Call.</h2>
                     <p className="text-zinc-500 max-w-sm">
                       Pick a 30-minute slot that works for you. We&apos;ll send a calendar invite with a video link — no interrogations, just engineering talk.
                     </p>
@@ -276,9 +274,7 @@ export default function ContactPage() {
                   ) : (
                     <form ref={formRef} onSubmit={handleSubmit} className="space-y-8 relative z-10">
                       <div className="mb-10 text-center md:text-left">
-                        <h2 className="tracking-tight lowercase mb-3">
-                          Direct Protocol.
-                        </h2>
+                        <h2 className="tracking-tight mb-3">Direct Protocol.</h2>
                         <p className="text-zinc-500">
                           Brief us on your objectives and we'll engineer the path forward.
                         </p>
