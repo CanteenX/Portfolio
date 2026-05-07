@@ -31,8 +31,8 @@ export function Navbar() {
         <div className="flex items-center justify-between">
 
           {/* Logo */}
-          <a href="/" className="font-mono font-medium tracking-tighter text-sm flex items-center gap-2 text-white">
-            <div className="size-2.5 bg-mint inline-block" aria-hidden />
+          <a href="/" className="font-mono font-medium tracking-tighter text-base flex items-center gap-2 text-white">
+            <div className="size-3 bg-mint inline-block" aria-hidden />
             <span>{brandName}</span>
           </a>
 
@@ -43,7 +43,7 @@ export function Navbar() {
             ))}
             <Link
               href={ctaLink.href}
-              className="bg-white text-black text-xs font-bold px-4 py-2 hover:bg-mint transition-colors tracking-widest uppercase"
+              className="bg-white text-black text-sm font-bold px-6 py-2.5 hover:bg-mint transition-colors tracking-widest uppercase rounded-full"
             >
               {ctaLink.label}
             </Link>
@@ -82,7 +82,7 @@ export function Navbar() {
 
 function NavLink({ href, label }: { href: string; label: string }) {
   return (
-    <a href={href} className="text-xs font-medium text-zinc-200 hover:text-white tracking-wide transition-colors">
+    <a href={href} className="text-sm font-medium text-zinc-200 hover:text-white tracking-wide transition-colors">
       {label}
     </a>
   );

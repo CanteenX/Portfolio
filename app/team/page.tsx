@@ -3,11 +3,12 @@
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 import { TEAM } from "@/lib/team";
-import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
 import { usePublicAPI, usePublicSettings } from "@/lib/usePublicAPI";
 import { getPublicTeam, getPublicSettings, resolveImageUrl } from "@/lib/api";
+import { FaLinkedin, FaGithub } from "react-icons/fa";
+import { ArrowUpRight } from "lucide-react";
 
 const FALLBACK_PLAYBOOK = [
   { phase: "01", name: "Discovery", body: "1-week deep dive: scope, success metrics, architecture sketch." },
@@ -27,43 +28,107 @@ export default function TeamPage() {
 
       <div className="pt-28 pb-16 px-6">
         <div className="max-w-7xl mx-auto">
+          {/* Header */}
           <ScrollReveal direction="up">
-            <div className="text-mono-tag text-mint mb-4">/team — The Collective</div>
-            <h1 className="mb-12 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-              The engineers behind the code.
-            </h1>
+            <div className="text-center mb-16">
+              <div className="text-mono-tag text-mint mb-4">/team — The Collective</div>
+              <h1 className="mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                Meet our team.
+              </h1>
+              <p className="text-gray-400 max-w-2xl mx-auto text-lg">
+                The engineers, designers and strategists behind every line of code and pixel-perfect interface.
+              </p>
+            </div>
           </ScrollReveal>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5 border hairline mb-20 overflow-hidden rounded-3xl">
+          {/* Team Grid — photo cards with glass overlay */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
             {team.map((p, index) => (
-              <ScrollReveal key={p.slug} delay={index * 0.1} direction="up">
-                <Link
-                  href={`/team/${p.slug}`}
-                  className="bg-zinc-900/50 backdrop-blur-sm border-r border-b border-white/5 group block hover:bg-zinc-800/80 transition-all duration-500 h-full"
-                >
-                  <div className="aspect-[4/5] overflow-hidden bg-zinc-950 relative">
-                    <img
-                      src={resolveImageUrl(p.avatar)}
-                      alt={p.name}
-                      loading="lazy"
-                      className="w-full h-full object-cover grayscale contrast-110 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    <div className="absolute top-4 left-4 text-mono-tag text-gray-500">{p.id}</div>
-                  </div>
-                  <div className="p-8">
-                    <div className="text-mono-tag text-mint mb-3">{p.role}</div>
-                    <h3 className="text-2xl font-bold mb-3 group-hover:text-mint transition-colors">{p.name}</h3>
-                    <p className="text-sm text-gray-400 leading-relaxed mb-6 line-clamp-2">{p.power}</p>
-                    <div className="text-mono-tag text-mint flex items-center gap-2">
-                       Open Dossier <span className="group-hover:translate-x-1 transition-transform">→</span>
+              <ScrollReveal key={p.slug} delay={index * 0.08} direction="up">
+                <div className="team-card group relative rounded-3xl overflow-hidden aspect-[3/3.5] cursor-default">
+                  {/* Full photo background */}
+                  <img
+                    src={resolveImageUrl(p.avatar)}
+                    alt={p.name}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+
+                  {/* Gradient scrim from bottom */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
+
+                  {/* Glassmorphism info overlay at bottom */}
+                  <div className="absolute bottom-4 left-4 right-4 rounded-2xl p-5 transition-all duration-500 group-hover:bottom-5"
+                    style={{
+                      background: "rgba(30, 30, 30, 0.45)",
+                      backdropFilter: "blur(20px) saturate(1.4)",
+                      WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+                      border: "1px solid rgba(255, 255, 255, 0.12)",
+                      boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+                    }}
+                  >
+                    {/* Top row: name + arrow */}
+                    <div className="flex items-start justify-between mb-1">
+                      <div>
+                        <h3 className="text-lg font-bold text-white leading-tight">{p.name}</h3>
+                        <div className="text-xs font-medium text-gray-300/80 mt-0.5">{p.role}</div>
+                      </div>
+                      <div
+                        className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5 transition-colors duration-300 group-hover:bg-white/20"
+                        style={{
+                          background: "rgba(255, 255, 255, 0.1)",
+                          border: "1px solid rgba(255, 255, 255, 0.15)",
+                        }}
+                      >
+                        <ArrowUpRight className="w-3.5 h-3.5 text-white/80" />
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-[13px] text-gray-300/70 leading-relaxed mt-2 mb-4 line-clamp-2">
+                      {p.power}
+                    </p>
+
+                    {/* Social icons row */}
+                    <div className="flex items-center gap-3">
+                      {p.socials?.linkedin && (
+                        <a
+                          href={p.socials.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${p.name} LinkedIn`}
+                          className="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300"
+                          style={{
+                            background: "rgba(255, 255, 255, 0.15)",
+                            border: "1px solid rgba(255, 255, 255, 0.2)",
+                          }}
+                        >
+                          <FaLinkedin className="w-4 h-4" />
+                        </a>
+                      )}
+                      {p.socials?.github && (
+                        <a
+                          href={p.socials.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${p.name} GitHub`}
+                          className="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300"
+                          style={{
+                            background: "rgba(255, 255, 255, 0.15)",
+                            border: "1px solid rgba(255, 255, 255, 0.2)",
+                          }}
+                        >
+                          <FaGithub className="w-4 h-4" />
+                        </a>
+                      )}
                     </div>
                   </div>
-                </Link>
+                </div>
               </ScrollReveal>
             ))}
           </div>
 
+          {/* Playbook Section */}
           <div>
             <ScrollReveal direction="up">
               <div className="text-mono-tag text-mint mb-4">Our_Playbook //</div>

@@ -148,27 +148,7 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* CTA strip */}
-        <section className="px-6 pb-16">
-          <div className="max-w-7xl mx-auto">
-            <ScrollReveal direction="up">
-              <div className="border border-white/10 rounded-3xl p-12 flex flex-col md:flex-row items-center justify-between gap-8 bg-zinc-950/40">
-                <div>
-                  <h3 className="text-2xl font-semibold mb-2">Not sure what you need?</h3>
-                  <p className="text-zinc-400 text-sm font-light">
-                    Book a free 30-minute discovery call. We'll scope it together.
-                  </p>
-                </div>
-                <Link
-                  href="/contact"
-                  className="shrink-0 px-10 py-4 bg-mint text-black font-bold text-xs uppercase tracking-widest hover:brightness-110 transition-all"
-                >
-                  Book a Call
-                </Link>
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
+
 
         <ContactCTA />
         <Footer />

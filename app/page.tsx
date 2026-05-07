@@ -104,7 +104,7 @@ export default function Home() {
             <div className="flex items-end justify-between mb-12">
               <div>
                 <div className="text-mono-tag text-mint mb-3">Our_Projects //</div>
-                <h2 className="tracking-tight capitalize">Recent deployments.</h2>
+                <h2 className="tracking-tight">Recent deployments.</h2>
               </div>
               <Link href="/work" className="hidden md:inline-block text-mono-tag text-zinc-500 hover:text-mint transition-colors">
                 View all deployments →
@@ -125,7 +125,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
-              <h2 className="mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 capitalize">
+              <h2 className="mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
                 Services We Offer.
               </h2>
               <p className="text-zinc-500 max-w-2xl mx-auto">
@@ -145,7 +145,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
-              <h2 className="mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 capitalize">
+              <h2 className="mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
                 AI &amp; LLM Services.
               </h2>
               <p className="text-zinc-500 max-w-2xl mx-auto">

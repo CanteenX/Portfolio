@@ -58,6 +58,7 @@ export const TEAM: Member[] = [
       { type: "Health", title: "Pulse Companion", tags: ["Kotlin", "HealthKit", "BLE"] },
     ],
     certificates: [{ title: "Apple Certified iOS Developer" }, { title: "Google Mobile Web Specialist" }],
+    socials: { github: "https://github.com", linkedin: "https://linkedin.com" },
   },
   {
     id: "FC-002",
@@ -93,6 +94,7 @@ export const TEAM: Member[] = [
       { type: "Open Source", title: "Tessera", tags: ["Rust", "WASM", "CRDT"] },
     ],
     certificates: [{ title: "AWS Solutions Architect — Pro" }, { title: "CKA — Certified Kubernetes Admin" }],
+    socials: { github: "https://github.com", linkedin: "https://linkedin.com" },
   },
   {
     id: "FC-003",
@@ -128,6 +130,7 @@ export const TEAM: Member[] = [
       { type: "Marketing", title: "Helios Site", tags: ["Next.js", "Framer Motion"] },
     ],
     certificates: [{ title: "IAAP Web Accessibility Specialist" }],
+    socials: { github: "https://github.com", linkedin: "https://linkedin.com" },
   },
   {
     id: "FC-004",
@@ -163,6 +166,7 @@ export const TEAM: Member[] = [
       { type: "Internal Tools", title: "Forge Ops Console", tags: ["React", "Node", "Redis"] },
     ],
     certificates: [{ title: "MongoDB Certified Developer" }],
+    socials: { github: "https://github.com", linkedin: "https://linkedin.com" },
   },
   {
     id: "FC-005",
@@ -198,6 +202,7 @@ export const TEAM: Member[] = [
       { type: "Tooling", title: "Trace Lens", tags: ["OpenTelemetry", "Grafana"] },
     ],
     certificates: [{ title: "HashiCorp Certified Terraform Associate" }, { title: "CKA — Certified Kubernetes Admin" }],
+    socials: { github: "https://github.com", linkedin: "https://linkedin.com" },
   },
   {
     id: "FC-006",
@@ -233,6 +238,7 @@ export const TEAM: Member[] = [
       { type: "Internal", title: "Forge Insights", tags: ["TypeScript", "DuckDB"] },
     ],
     certificates: [{ title: "Reforge — Product Strategy" }],
+    socials: { github: "https://github.com", linkedin: "https://linkedin.com" },
   },
 ];
 
