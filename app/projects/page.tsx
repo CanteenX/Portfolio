@@ -8,7 +8,7 @@ import { PROJECTS } from "@/lib/projects";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
 import { usePublicAPI } from "@/lib/usePublicAPI";
-import { getPublicProjects } from "@/lib/api";
+import { getPublicProjects, resolveImageUrl } from "@/lib/api";
 
 const FILTERS = ["All", "Native Mobile", "Web Apps", "Backend/Cloud"] as const;
 
@@ -56,7 +56,7 @@ export default function WorkPage() {
                   className="group relative block aspect-[16/10] overflow-hidden bg-zinc-900 border-r border-b border-white/5 last:border-r-0"
                 >
                   <img
-                    src={p.image}
+                    src={resolveImageUrl(p.image)}
                     alt={p.title}
                     loading="lazy"
                     className="absolute inset-0 w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-1000 opacity-40 group-hover:opacity-80 group-hover:scale-105"
