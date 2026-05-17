@@ -2,7 +2,12 @@ import axios from "axios";
 import type { Project } from "./projects";
 import type { Member } from "./team";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002";
+// In production the website is served from the same origin as /api (via Next.js
+// rewrites), so an empty baseURL keeps requests relative. In local dev, fall
+// back to the standalone backend port.
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:7002");
 
 export function resolveImageUrl(path: string | undefined | null): string {
   if (!path) return "";
