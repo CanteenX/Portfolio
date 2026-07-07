@@ -8,13 +8,13 @@ import { PROJECTS } from "@/lib/projects";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
 import { usePublicAPI } from "@/lib/usePublicAPI";
-import { getPublicProjects, resolveImageUrl } from "@/lib/api";
+import { getPublicProjects, resolveImageUrl, type ApiProject } from "@/lib/api";
 
 const FILTERS = ["All", "Native Mobile", "Web Apps", "Backend/Cloud"] as const;
 
 export default function WorkPage() {
   const [filter, setFilter] = useState<typeof FILTERS[number]>("All");
-  const { data: projects } = usePublicAPI(getPublicProjects, PROJECTS);
+  const { data: projects } = usePublicAPI(getPublicProjects, PROJECTS as unknown as ApiProject[]);
   const filtered = filter === "All" ? projects : projects.filter((p) => p.category === filter);
 
   return (
