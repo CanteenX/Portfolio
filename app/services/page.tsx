@@ -93,7 +93,7 @@ export default function ServicesPage() {
               <div className="text-mono-tag text-mint mb-4">Our_Services //</div>
               <h1 className="mb-6">
                 What we{" "}
-                <span className="text-emerald-500 italic">build.</span>
+                <span className="text-white italic">build.</span>
               </h1>
               <p className="text-zinc-400 max-w-2xl text-lg md:text-xl leading-relaxed font-light">
                 From zero to production. We cover the full stack — design,

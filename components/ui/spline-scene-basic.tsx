@@ -5,17 +5,17 @@ import { Spotlight as SpotlightAceternity } from "@/components/ui/spotlight-acet
 
 export function SplineSceneBasic() {
   return (
-    <div className="w-full h-screen bg-black relative overflow-hidden">
+    <div className="w-full min-h-screen lg:h-screen bg-black relative overflow-hidden">
       <SpotlightAceternity
         className="-top-40 left-0 md:left-60 md:-top-20"
         fill="white"
       />
 
-      <div className="flex h-full flex-col md:flex-row">
+      <div className="flex min-h-screen lg:min-h-0 lg:h-full flex-col lg:flex-row">
         {/* Left content — starts below the fixed navbar */}
-        <div className="flex-1 px-12 md:px-24 pt-40 md:pt-48 relative z-10 flex flex-col justify-start pb-16">
+        <div className="flex-1 px-6 md:px-24 pt-32 md:pt-48 relative z-10 flex flex-col justify-start pb-10 lg:pb-16">
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tighter leading-[0.88] bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400">
-            We Engineer <span className="text-emerald-500 italic">High-Performance</span> <br/>Web &amp; Mobile Products
+            We Engineer <span className="text-white italic">High-Performance</span> <br/>Web &amp; Mobile Products
           </h1>
           <p className="mt-8 text-neutral-400 text-base md:text-lg max-w-xl leading-relaxed font-light">
             An elite engineering collective transforming complex problems into elegant production-grade software.
@@ -37,22 +37,12 @@ export function SplineSceneBasic() {
           </div>
         </div>
 
-        {/* Right content - The Robot */}
-        <div className="hidden lg:flex flex-1 relative w-full h-full items-center justify-center">
+        {/* Right content - The Robot (visible on all screen sizes) */}
+        <div className="flex flex-1 relative w-full h-[55vh] min-h-[360px] lg:h-auto lg:min-h-0 items-center justify-center">
           <SplineScene
             scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
             className="w-full h-full"
           />
-        </div>
-
-        {/* Mobile image fallback — shown below lg */}
-        <div className="lg:hidden flex-1 w-full h-[40vh] relative overflow-hidden">
-          <img
-            src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80"
-            alt="Engineering"
-            className="w-full h-full object-cover opacity-30"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         </div>
       </div>
       

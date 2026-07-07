@@ -33,8 +33,8 @@ const FALLBACK_PHASES = [
     title: "Development",
     description:
       "Clean, modular code built with modern frameworks. Weekly demos keep you in the loop with full transparency.",
-    accent: "from-emerald-500/20 to-emerald-500/0",
-    dot: "bg-emerald-500",
+    accent: "from-white/20 to-white/0",
+    dot: "bg-white",
   },
   {
     id: "qa",
@@ -77,8 +77,8 @@ const FALLBACK_PERKS = [
     title: "Unbreakable Commitment",
     description: "Your deadlines are our deadlines. Transparent updates, no ghosting.",
     icon: "🤝",
-    gradient: "from-emerald-500/10 via-transparent to-transparent",
-    border: "hover:border-emerald-500/30",
+    gradient: "from-white/10 via-transparent to-transparent",
+    border: "hover:border-white/30",
   },
   {
     title: "Built to Scale",

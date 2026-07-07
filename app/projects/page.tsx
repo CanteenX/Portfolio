@@ -21,30 +21,75 @@ export default function WorkPage() {
     <main className="min-h-screen bg-black text-white selection:bg-mint/30">
       <Navbar />
 
-      <div className="pt-32 pb-20 px-6">
-        <div className="max-w-7xl mx-auto">
+      {/* Hero */}
+      <div className="pt-40 pb-16 px-6 border-b border-white/5 relative overflow-hidden">
+        {/* Subtle background grid */}
+        <div
+          className="absolute inset-0 opacity-[0.04] pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+            backgroundSize: "80px 80px",
+          }}
+        />
+        <div className="max-w-7xl mx-auto relative">
           <ScrollReveal direction="up">
-            <div className="text-mono-tag text-mint mb-4">/work — Selected Engagements</div>
-            <h1 className="mb-12 max-w-3xl">
-              Engineering that solves <span className="text-zinc-500">business problems.</span>
-            </h1>
-          </ScrollReveal>
+            <div className="flex flex-col lg:flex-row lg:items-end gap-10 lg:gap-16">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="w-8 h-px bg-white/40" />
+                  <span className="text-mono-tag text-zinc-400">/work — Selected Engagements</span>
+                </div>
+                <h1 className="max-w-3xl bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-500">
+                  Engineering that solves business problems.
+                </h1>
+              </div>
 
-          <ScrollReveal direction="up" delay={0.2}>
-            <div className="flex flex-wrap gap-1 mb-10 border border-white/10 p-1 w-fit bg-zinc-900/30 backdrop-blur-sm rounded-lg">
-              {FILTERS.map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={`text-mono-tag px-6 py-2.5 transition-all duration-300 rounded-md ${
-                    filter === f
-                      ? "bg-mint text-black font-bold shadow-[0_0_15px_rgba(0,255,163,0.3)]"
-                      : "text-zinc-500 hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
+              <div className="lg:max-w-sm shrink-0 lg:pb-2">
+                <p className="text-zinc-400 text-base leading-relaxed mb-8">
+                  A curated archive of shipped products — mobile, web, and cloud systems
+                  built for scale and measured by outcomes.
+                </p>
+                <div className="grid grid-cols-3 gap-px bg-white/10 border border-white/10 rounded-xl overflow-hidden">
+                  {[
+                    { value: `${projects.length}+`, label: "Projects" },
+                    { value: "3", label: "Platforms" },
+                    { value: "100%", label: "Shipped" },
+                  ].map((s) => (
+                    <div key={s.label} className="bg-zinc-950 px-4 py-4 text-center">
+                      <div className="text-2xl font-medium tracking-tight text-white">{s.value}</div>
+                      <div className="text-mono-tag text-zinc-500 mt-1">{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </div>
+
+      <div className="pb-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <ScrollReveal direction="up" delay={0.1}>
+            <div className="flex flex-wrap items-center justify-between gap-4 py-8">
+              <div className="flex flex-wrap gap-1 border border-white/10 p-1 w-fit bg-zinc-900/30 backdrop-blur-sm rounded-full">
+                {FILTERS.map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    className={`text-mono-tag px-6 py-2.5 transition-all duration-300 rounded-full ${
+                      filter === f
+                        ? "bg-white text-black font-bold"
+                        : "text-zinc-500 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+              <div className="text-mono-tag text-zinc-600">
+                {filtered.length} {filtered.length === 1 ? "result" : "results"}
+              </div>
             </div>
           </ScrollReveal>
 

@@ -54,7 +54,7 @@ const screens = [
     caption: "Speak freely, understand globally",
     description: "Experience zero-latency translation streams. Real-time subtitles and audio dubbing in 100+ languages directly during the call.",
     image: "https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1600&q=80",
-    color: "from-emerald-500/20 to-transparent"
+    color: "from-white/20 to-transparent"
   },
   { 
     id: 3, 
@@ -132,7 +132,7 @@ export default function WeConversePage() {
             >
               ← /projects
             </Link>
-            <div className="text-mono-tag text-emerald-400 mb-4 font-semibold">
+            <div className="text-mono-tag text-neutral-200 mb-4 font-semibold">
               /we-converse — Native Mobile
             </div>
             <h1 className="mb-10 max-w-5xl leading-[0.85]">
@@ -169,12 +169,12 @@ export default function WeConversePage() {
 
       {/* ============ TECH STACK DESIGN (Moved here: exactly below header image) ============ */}
       <section className="py-20 px-6 bg-zinc-950/50 border-y border-white/5 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[120px] rounded-full pointer-none" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/5 blur-[120px] rounded-full pointer-none" />
         
         <div className="max-w-7xl mx-auto">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
-              <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/the_stack</div>
+              <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_stack</div>
               <h2 className="mb-6">Engineered for accuracy.</h2>
               <p className="text-zinc-500 max-w-2xl mx-auto">
                 A robust pipeline of proprietary models and open-source infrastructure ensuring 
@@ -186,7 +186,7 @@ export default function WeConversePage() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {techStack.map((tech, i) => (
               <ScrollReveal key={tech.name} delay={i * 0.05} direction="up">
-                <div className="group p-6 bg-zinc-900/30 border border-white/5 rounded-3xl hover:border-emerald-500/30 transition-all duration-500 h-full flex flex-col items-center text-center">
+                <div className="group p-6 bg-zinc-900/30 border border-white/5 rounded-3xl hover:border-white/30 transition-all duration-500 h-full flex flex-col items-center text-center">
                   <div className="w-14 h-14 rounded-2xl bg-zinc-950 border border-white/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
                     <tech.icon size={28} style={{ color: tech.color }} />
                   </div>
@@ -206,7 +206,7 @@ export default function WeConversePage() {
         <div className="max-w-7xl mx-auto">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
-              <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/the_roi</div>
+              <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_roi</div>
               <h2 className="mb-6">Tangible impact.</h2>
               <p className="text-zinc-500 max-w-2xl mx-auto">
                 We don't just ship code; we ship results. Here is how We Converse transformed 
@@ -219,11 +219,11 @@ export default function WeConversePage() {
             {roiPoints.map((point, i) => (
               <ScrollReveal key={point.label} delay={i * 0.1} direction="up">
                 <div className="p-8 bg-zinc-900/40 border border-white/5 rounded-3xl h-full flex flex-col items-center text-center">
-                  <div className="p-3 rounded-xl bg-emerald-500/10 mb-6">
-                    <point.icon className="w-6 h-6 text-emerald-400" />
+                  <div className="p-3 rounded-xl bg-white/10 mb-6">
+                    <point.icon className="w-6 h-6 text-neutral-200" />
                   </div>
                   <div className="text-4xl font-bold mb-2 tabular-nums">{point.title}</div>
-                  <div className="text-mono-tag text-emerald-400 mb-4">{point.label}</div>
+                  <div className="text-mono-tag text-neutral-200 mb-4">{point.label}</div>
                   <p className="text-sm text-zinc-500 leading-relaxed">
                     {point.desc}
                   </p>
@@ -240,8 +240,8 @@ export default function WeConversePage() {
           <div className="lg:sticky lg:top-32 self-start space-y-12">
             <ScrollReveal direction="left">
               <div>
-                <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/the_problem</div>
-                <h2 className="mb-6 lowercase">Language barriers in real-time.</h2>
+                <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_problem</div>
+                <h2 className="mb-6">Language barriers in real-time.</h2>
                 <p className="text-zinc-400 max-w-xl">
                   Global teams struggle with synchronous communication when language barriers exist. 
                   Traditional translation tools are cumbersome, causing conversational friction and 
@@ -252,8 +252,8 @@ export default function WeConversePage() {
 
             <ScrollReveal direction="left" delay={0.2}>
               <div>
-                <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/the_solution</div>
-                <h2 className="mb-6 lowercase">Frictionless understanding.</h2>
+                <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_solution</div>
+                <h2 className="mb-6">Frictionless understanding.</h2>
                 <p className="text-zinc-400 max-w-xl">
                   We engineered a native experience that leverages low-latency WebRTC streams and 
                   cutting-edge AI models. By integrating Whisper for transcription and GPT-4 for 
@@ -302,7 +302,7 @@ export default function WeConversePage() {
         <div className="max-w-7xl mx-auto">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
-              <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/interface</div>
+              <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/interface</div>
               <h2 className="mb-6">Product in action.</h2>
               <p className="text-zinc-500 max-w-xl mx-auto">
                 Clean, distraction-free interfaces designed for the modern remote work era.
@@ -342,14 +342,14 @@ export default function WeConversePage() {
                       isActive ? "translate-y-0 opacity-100 delay-300" : "translate-y-20 opacity-0"
                     }`}
                   >
-                    <div className="text-mono-tag text-emerald-400 mb-4">Screen 0{screen.id}</div>
+                    <div className="text-mono-tag text-neutral-200 mb-4">Screen 0{screen.id}</div>
                     <h3 className="text-3xl md:text-4xl font-bold mb-4 tracking-tighter">{screen.label}</h3>
                     <p className="text-zinc-400 text-base max-w-md mb-6">
                       {screen.description}
                     </p>
                     <div className="flex gap-1">
                        {[0, 1, 2].map(i => (
-                         <div key={i} className={`h-0.5 rounded-full bg-emerald-400 transition-all duration-1000 ${isActive && i === index ? 'w-10' : 'w-2 opacity-20'}`} />
+                         <div key={i} className={`h-0.5 rounded-full bg-neutral-200 transition-all duration-1000 ${isActive && i === index ? 'w-10' : 'w-2 opacity-20'}`} />
                        ))}
                     </div>
                   </div>
@@ -373,7 +373,7 @@ export default function WeConversePage() {
         <div className="max-w-5xl mx-auto">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
-              <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/intelligence</div>
+              <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/intelligence</div>
               <h2 className="mb-4">Intelligence layers.</h2>
               <p className="text-zinc-400 max-w-xl mx-auto">
                 Behind the simple interface lies a complex network of AI agents working in concert.
@@ -383,14 +383,14 @@ export default function WeConversePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
              {[
                { title: "Privacy First", icon: Shield, desc: "On-device processing for sensitive conversations, ensuring zero data leakage.", color: "text-blue-400" },
-               { title: "Context Aware", icon: Sparkles, desc: "AI learns your industry terminology to provide precise translations.", color: "text-emerald-400" },
+               { title: "Context Aware", icon: Sparkles, desc: "AI learns your industry terminology to provide precise translations.", color: "text-neutral-200" },
                { title: "Direct Connect", icon: MessageSquare, desc: "Peer-to-peer WebRTC channels for maximum privacy and minimum lag.", color: "text-purple-400" },
                { title: "Diarization", icon: Zap, desc: "Advanced speaker identity models to correctly attribute quotes in minutes.", color: "text-amber-400" },
                { title: "Reliability", icon: CheckCircle2, desc: "99.9% availability through distributed AWS/Kubernetes architecture.", color: "text-rose-400" },
                { title: "Action Items", icon: FileText, desc: "Smart extraction of tasks and deadlines during the conversation.", color: "text-indigo-400" },
              ].map((f, i) => (
                 <ScrollReveal key={f.title} delay={i * 0.1} direction="up">
-                  <div className="p-8 rounded-3xl border border-white/5 bg-zinc-900/30 hover:border-emerald-500/20 transition-all duration-500">
+                  <div className="p-8 rounded-3xl border border-white/5 bg-zinc-900/30 hover:border-white/20 transition-all duration-500">
                     <f.icon className={`w-8 h-8 ${f.color} mb-6`} />
                     <h3 className="text-xl font-bold mb-3">{f.title}</h3>
                     <p className="text-zinc-500 text-sm leading-relaxed">{f.desc}</p>
@@ -404,7 +404,7 @@ export default function WeConversePage() {
       {/* ============ HOW IT WORKS ============ */}
       <section className="py-24 px-6 border-b border-white/5 bg-zinc-950/20">
         <div className="max-w-5xl mx-auto text-center mb-16">
-          <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/the_workflow</div>
+          <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_workflow</div>
           <h2 className="mb-4 lowercase">How we built it.</h2>
         </div>
 
@@ -427,11 +427,11 @@ export default function WeConversePage() {
             },
           ].map((item, i) => (
             <ScrollReveal key={item.step} delay={i * 0.1} direction="up">
-              <div className="relative p-10 rounded-[2rem] border border-white/5 bg-zinc-950 group hover:border-emerald-500/10 transition-all duration-500 overflow-hidden">
-                <div className="absolute -top-10 -right-10 text-[8rem] font-black text-white/[0.02] leading-none group-hover:text-emerald-500/[0.02] transition-colors">
+              <div className="relative p-10 rounded-[2rem] border border-white/5 bg-zinc-950 group hover:border-white/10 transition-all duration-500 overflow-hidden">
+                <div className="absolute -top-10 -right-10 text-[8rem] font-black text-white/[0.02] leading-none group-hover:text-white/[0.02] transition-colors">
                   {item.step}
                 </div>
-                <div className="text-mono-tag text-emerald-400 mb-6 font-bold">STEP_{item.step}</div>
+                <div className="text-mono-tag text-neutral-200 mb-6 font-bold">STEP_{item.step}</div>
                 <h3 className="text-xl font-bold text-white mb-3">
                   {item.title}
                 </h3>

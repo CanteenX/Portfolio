@@ -29,8 +29,8 @@ export const TEAM: Member[] = [
     role: "Lead Mobile Architect",
     avatar:
       "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=facearea&facepad=2.5&w=900&q=80",
-    glow: "#34d399",
-    accent: "from-emerald-400 to-cyan-400",
+    glow: "#e5e5e5",
+    accent: "from-neutral-200 to-cyan-400",
     power: "Obsessed with reducing mobile payload sizes and shipping 60fps animations.",
     bio: "I build mobile experiences that feel weightless. Every frame, every byte, every interaction is a deliberate choice — not an accident.",
     personal: {

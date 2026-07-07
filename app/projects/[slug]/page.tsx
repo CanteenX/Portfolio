@@ -112,7 +112,7 @@ export default function ProjectDetailsPage() {
   if (project === undefined) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -121,7 +121,7 @@ export default function ProjectDetailsPage() {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
         <h1 className="text-4xl font-bold mb-4">Project Not Found</h1>
-        <a href="/work" className="text-emerald-500 hover:underline">Back to Work</a>
+        <a href="/work" className="text-white hover:underline">Back to Work</a>
       </div>
     );
   }
@@ -164,7 +164,7 @@ export default function ProjectDetailsPage() {
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 /projects
               </button>
-              <div className="text-mono-tag text-emerald-400 mb-4 font-semibold">
+              <div className="text-mono-tag text-neutral-200 mb-4 font-semibold">
                 /{project.slug} — {project.category}
               </div>
               <h1 className="mb-10 max-w-5xl leading-[0.85]">{project.title}</h1>
@@ -200,11 +200,11 @@ export default function ProjectDetailsPage() {
         {/* ── TECH STACK ── */}
         {displayTechStacks.length > 0 && (
           <section className="py-20 px-6 bg-zinc-950/50 border-y border-white/5 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/5 blur-[120px] rounded-full pointer-events-none" />
             <div className="max-w-7xl mx-auto">
               <ScrollReveal direction="up">
                 <div className="text-center mb-16">
-                  <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/the_stack</div>
+                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_stack</div>
                   <h2 className="mb-6">Engineered for accuracy.</h2>
                   {project.stackSectionDescription && (
                     <p className="text-zinc-500 max-w-2xl mx-auto">{project.stackSectionDescription}</p>
@@ -215,12 +215,12 @@ export default function ProjectDetailsPage() {
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {displayTechStacks.map((tech, i) => (
                   <ScrollReveal key={tech._id} delay={i * 0.05} direction="up">
-                    <div className="group p-6 bg-zinc-900/30 border border-white/5 rounded-3xl hover:border-emerald-500/30 transition-all duration-500 h-full flex flex-col items-center text-center">
+                    <div className="group p-6 bg-zinc-900/30 border border-white/5 rounded-3xl hover:border-white/30 transition-all duration-500 h-full flex flex-col items-center text-center">
                       <div className="w-14 h-14 rounded-2xl bg-zinc-950 border border-white/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
                         {tech.image ? (
                           <img src={resolveImageUrl(tech.image)} alt={tech.name} className="w-8 h-8 object-contain" />
                         ) : (
-                          <Code2 className="w-7 h-7 text-emerald-400" />
+                          <Code2 className="w-7 h-7 text-neutral-200" />
                         )}
                       </div>
                       <div className="font-bold text-base mb-1">{tech.name}</div>
@@ -243,7 +243,7 @@ export default function ProjectDetailsPage() {
             <div className="max-w-7xl mx-auto">
               <ScrollReveal direction="up">
                 <div className="text-center mb-16">
-                  <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/the_roi</div>
+                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_roi</div>
                   <h2 className="mb-6">Tangible impact.</h2>
                   {project.roiSectionDescription && (
                     <p className="text-zinc-500 max-w-2xl mx-auto">{project.roiSectionDescription}</p>
@@ -259,16 +259,16 @@ export default function ProjectDetailsPage() {
                     <ScrollReveal key={i} delay={i * 0.1} direction="up">
                       {hasDetails ? (
                         <div className="p-8 bg-zinc-900/40 border border-white/5 rounded-3xl h-full flex flex-col items-center text-center">
-                          <div className="p-3 rounded-xl bg-emerald-500/10 mb-6">
-                            <IconComponent className="w-6 h-6 text-emerald-400" />
+                          <div className="p-3 rounded-xl bg-white/10 mb-6">
+                            <IconComponent className="w-6 h-6 text-neutral-200" />
                           </div>
                           <div className="text-4xl font-bold mb-2 tabular-nums">{point.value}</div>
-                          {point.label && <div className="text-mono-tag text-emerald-400 mb-4">{point.label}</div>}
+                          {point.label && <div className="text-mono-tag text-neutral-200 mb-4">{point.label}</div>}
                           {point.description && <p className="text-sm text-zinc-500 leading-relaxed">{point.description}</p>}
                         </div>
                       ) : (
                         <div className="p-6 bg-zinc-900/40 border border-white/5 rounded-2xl h-full flex items-start gap-4">
-                          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                          <CheckCircle2 className="w-5 h-5 text-white shrink-0 mt-0.5" />
                           <span className="text-zinc-300">{point.value}</span>
                         </div>
                       )}
@@ -288,7 +288,7 @@ export default function ProjectDetailsPage() {
                 {project.problem && (
                   <ScrollReveal direction="left">
                     <div>
-                      <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/the_problem</div>
+                      <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_problem</div>
                       <h2 className="mb-6 lowercase">The challenge.</h2>
                       <p className="text-zinc-400 max-w-xl">{project.problem}</p>
                     </div>
@@ -297,7 +297,7 @@ export default function ProjectDetailsPage() {
                 {project.solution && (
                   <ScrollReveal direction="left" delay={0.2}>
                     <div>
-                      <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/the_solution</div>
+                      <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_solution</div>
                       <h2 className="mb-6 lowercase">Our approach.</h2>
                       <p className="text-zinc-400 max-w-xl">{project.solution}</p>
                     </div>
@@ -333,7 +333,7 @@ export default function ProjectDetailsPage() {
             <div className="max-w-7xl mx-auto">
               <ScrollReveal direction="up">
                 <div className="text-center mb-16">
-                  <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/interface</div>
+                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/interface</div>
                   <h2 className="mb-6">Product in action.</h2>
                 </div>
               </ScrollReveal>
@@ -361,14 +361,14 @@ export default function ProjectDetailsPage() {
                       <div className={`absolute inset-0 bg-gradient-to-t via-black/20 transition-all duration-700 ${isActive ? "from-black/90 opacity-100" : "from-black/60 opacity-0"}`} />
 
                       <div className={`relative z-10 p-10 transition-all duration-700 transform-gpu ${isActive ? "translate-y-0 opacity-100 delay-300" : "translate-y-20 opacity-0"}`}>
-                        <div className="text-mono-tag text-emerald-400 mb-4">Screen 0{index + 1}</div>
+                        <div className="text-mono-tag text-neutral-200 mb-4">Screen 0{index + 1}</div>
                         <h3 className="text-3xl md:text-4xl font-bold mb-4 tracking-tighter">{screen.label}</h3>
                         {screen.description && (
                           <p className="text-zinc-400 text-base max-w-md mb-6">{screen.description}</p>
                         )}
                         <div className="flex gap-1">
                           {project.screens.map((_, i) => (
-                            <div key={i} className={`h-0.5 rounded-full bg-emerald-400 transition-all duration-1000 ${isActive && i === index ? "w-10" : "w-2 opacity-20"}`} />
+                            <div key={i} className={`h-0.5 rounded-full bg-neutral-200 transition-all duration-1000 ${isActive && i === index ? "w-10" : "w-2 opacity-20"}`} />
                           ))}
                         </div>
                       </div>
@@ -392,7 +392,7 @@ export default function ProjectDetailsPage() {
             <div className="max-w-5xl mx-auto">
               <ScrollReveal direction="up">
                 <div className="text-center mb-16">
-                  <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/intelligence</div>
+                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/intelligence</div>
                   <h2 className="mb-4">Intelligence layers.</h2>
                   <p className="text-zinc-400 max-w-xl mx-auto">
                     Behind the simple interface lies a complex network of systems working in concert.
@@ -402,8 +402,8 @@ export default function ProjectDetailsPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {project.features.map((f, i) => (
                   <ScrollReveal key={i} delay={i * 0.1} direction="up">
-                    <div className="p-8 rounded-3xl border border-white/5 bg-zinc-900/30 hover:border-emerald-500/20 transition-all duration-500">
-                      <Zap className="w-8 h-8 text-emerald-400 mb-6" />
+                    <div className="p-8 rounded-3xl border border-white/5 bg-zinc-900/30 hover:border-white/20 transition-all duration-500">
+                      <Zap className="w-8 h-8 text-neutral-200 mb-6" />
                       <h3 className="text-xl font-bold mb-3">{f.title}</h3>
                       <p className="text-zinc-500 text-sm leading-relaxed">{f.description}</p>
                     </div>
@@ -418,17 +418,17 @@ export default function ProjectDetailsPage() {
         {project.workflowSteps.length > 0 && (
           <section className="py-24 px-6 border-b border-white/5 bg-zinc-950/20">
             <div className="max-w-5xl mx-auto text-center mb-16">
-              <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/the_workflow</div>
+              <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_workflow</div>
               <h2 className="mb-4 lowercase">How we built it.</h2>
             </div>
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
               {project.workflowSteps.map((item, i) => (
                 <ScrollReveal key={i} delay={i * 0.1} direction="up">
-                  <div className="relative p-10 rounded-[2rem] border border-white/5 bg-zinc-950 group hover:border-emerald-500/10 transition-all duration-500 overflow-hidden">
-                    <div className="absolute -top-10 -right-10 text-[8rem] font-black text-white/[0.02] leading-none group-hover:text-emerald-500/[0.02] transition-colors">
+                  <div className="relative p-10 rounded-[2rem] border border-white/5 bg-zinc-950 group hover:border-white/10 transition-all duration-500 overflow-hidden">
+                    <div className="absolute -top-10 -right-10 text-[8rem] font-black text-white/[0.02] leading-none group-hover:text-white/[0.02] transition-colors">
                       {item.step}
                     </div>
-                    <div className="text-mono-tag text-emerald-400 mb-6 font-bold">STEP_{item.step}</div>
+                    <div className="text-mono-tag text-neutral-200 mb-6 font-bold">STEP_{item.step}</div>
                     <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
                     <p className="text-zinc-400 text-sm leading-relaxed">{item.description}</p>
                   </div>
@@ -443,7 +443,7 @@ export default function ProjectDetailsPage() {
           <section className="py-24 px-6 overflow-hidden border-b border-white/5">
             <div className="max-w-7xl mx-auto">
               <ScrollReveal direction="up">
-                <div className="text-mono-tag text-emerald-400 mb-4 font-bold">/visual_process</div>
+                <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/visual_process</div>
                 <h2 className="text-4xl font-bold tracking-tight mb-16">Visual Process</h2>
               </ScrollReveal>
               <div className="flex flex-col gap-12">
@@ -477,7 +477,7 @@ export default function ProjectDetailsPage() {
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors text-sm font-mono"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/30 text-neutral-200 hover:bg-white/10 transition-colors text-sm font-mono"
                 >
                   <Globe className="w-4 h-4" />
                   Live Site

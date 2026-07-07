@@ -51,7 +51,7 @@ export default function WorkPage() {
 
         <div className="pt-36 pb-20 px-6 max-w-7xl mx-auto">
           <ScrollReveal direction="up">
-            <div className="font-mono text-xs uppercase tracking-widest text-emerald-500 mb-6">
+            <div className="font-mono text-xs uppercase tracking-widest text-white mb-6">
               /work — Selected Engagements
             </div>
             <h1 className="text-5xl md:text-8xl font-bold tracking-tighter mb-12 max-w-4xl leading-[0.9]">
@@ -68,7 +68,7 @@ export default function WorkPage() {
                   onClick={() => setFilter(f)}
                   className={`px-6 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all ${
                     filter === f
-                      ? "bg-emerald-500 text-black font-bold shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                      ? "bg-white text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)]"
                       : "text-zinc-500 hover:text-white"
                   }`}
                 >
@@ -80,7 +80,7 @@ export default function WorkPage() {
 
           {loading && (
             <div className="flex justify-center py-20">
-              <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
             </div>
           )}
 
@@ -104,23 +104,23 @@ export default function WorkPage() {
 
                     <div className="absolute inset-0 p-8 flex flex-col justify-between z-10">
                       <div className="flex justify-between items-start">
-                        <span className="font-mono text-[10px] uppercase tracking-widest px-3 py-1 bg-emerald-500 text-black font-bold rounded-full">
+                        <span className="font-mono text-[10px] uppercase tracking-widest px-3 py-1 bg-white text-black font-bold rounded-full">
                           {p.category}
                         </span>
                         <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">{p.year}</span>
                       </div>
 
                       <div>
-                        <h3 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 group-hover:text-emerald-400 transition-colors">
+                        <h3 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 group-hover:text-neutral-200 transition-colors">
                           {p.title}
                         </h3>
-                        <div className="font-mono text-xs text-emerald-500/80 font-medium tracking-widest">
+                        <div className="font-mono text-xs text-white/80 font-medium tracking-widest">
                           {p.metric}
                         </div>
                       </div>
                     </div>
 
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-emerald-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                   </Link>
                 </ScrollReveal>
               ))}

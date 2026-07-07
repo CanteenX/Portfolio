@@ -5,6 +5,7 @@ import { AiModelsList } from "@/components/ui/ai-models-preview";
 import { SplineSceneBasic } from "@/components/ui/spline-scene-basic";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import FeatureCarousel from "@/components/ui/feature-carousel";
+import StackFeatureSection from "@/components/ui/stack-feature-section";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import Link from "next/link";
 import { ContactCTA } from "@/components/ui/contact-cta";
@@ -13,12 +14,6 @@ import { Footer } from "@/components/ui/footer";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { usePublicSettings } from "@/lib/usePublicAPI";
 import { getPublicSettings } from "@/lib/api";
-
-const FALLBACK_TECH = [
-  "AWS", "REACT_NATIVE", "NODE.JS", "GRAPHQL", "POSTGRESQL",
-  "TYPESCRIPT", "KUBERNETES", "NEXT.JS", "SWIFT", "KOTLIN",
-  "TERRAFORM", "REDIS",
-];
 
 const FALLBACK_PROJECTS = [
   {
@@ -54,7 +49,6 @@ const FALLBACK_PROJECTS = [
 export default function Home() {
   const { settings } = usePublicSettings(getPublicSettings);
 
-  const techList = settings?.techMarquee?.length ? settings.techMarquee : FALLBACK_TECH;
   const featuredProjects = settings?.hero?.featuredProjects?.length
     ? settings.hero.featuredProjects
     : FALLBACK_PROJECTS;
@@ -68,33 +62,6 @@ export default function Home() {
       {/* Hero Section */}
       <section id="hero" className="w-full">
         <SplineSceneBasic />
-      </section>
-
-      {/* Validated Stack Banner */}
-      <section className="border-y border-white/5 bg-zinc-950/40 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto py-8 px-6 flex flex-col md:flex-row items-center gap-8">
-          <div className="shrink-0 text-xs uppercase tracking-widest text-zinc-500 font-bold">Validated Stack //</div>
-          <div className="flex-1 overflow-hidden relative w-full">
-            <div className="flex gap-12 items-center whitespace-nowrap animate-marquee">
-              {[...techList, ...techList].map((t, i) => (
-                <span key={i} className="text-zinc-400 text-base font-medium flex items-center gap-2">
-                  <span className="size-1.5 bg-mint inline-block rounded-full" />
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <style jsx global>{`
-          @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          .animate-marquee {
-            animation: marquee 30s linear infinite;
-          }
-        `}</style>
       </section>
 
       {/* Projects Section - Recent Deployments Design */}
@@ -158,6 +125,13 @@ export default function Home() {
             <AiModelsList />
           </ScrollReveal>
         </div>
+      </section>
+
+      {/* Tech Stack Section */}
+      <section id="tech-stack" className="px-4 bg-black border-t border-white/5">
+        <ScrollReveal direction="up">
+          <StackFeatureSection />
+        </ScrollReveal>
       </section>
 
       <ContactCTA />

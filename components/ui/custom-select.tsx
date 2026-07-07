@@ -74,7 +74,7 @@ export function CustomSelect({
                   >
                     <span className="flex-1">{opt}</span>
                     {isSelected && (
-                      <Check size={14} className="text-emerald-400 shrink-0" />
+                      <Check size={14} className="text-neutral-200 shrink-0" />
                     )}
                   </button>
                 );

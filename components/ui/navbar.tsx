@@ -31,9 +31,8 @@ export function Navbar() {
         <div className="flex items-center justify-between">
 
           {/* Logo */}
-          <a href="/" className="font-mono font-medium tracking-tighter text-base flex items-center gap-2 text-white">
-            <div className="size-3 bg-mint inline-block" aria-hidden />
-            <span>{brandName}</span>
+          <a href="/" className="font-mono font-medium tracking-tighter text-base text-white">
+            {brandName}
           </a>
 
           {/* Desktop Navigation */}

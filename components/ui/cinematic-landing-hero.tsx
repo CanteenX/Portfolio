@@ -391,7 +391,7 @@ export function CinematicHero({
 
                     {/* Dynamic Island Notch */}
                     <div className="absolute top-[5px] left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-black rounded-full z-50 flex items-center justify-end px-3 shadow-[inset_0_-1px_2px_rgba(255,255,255,0.1)]">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" />
                     </div>
 
                     {/* App Interface */}
@@ -428,8 +428,8 @@ export function CinematicHero({
                           </div>
                         </div>
                         <div className="phone-widget widget-depth rounded-2xl p-3 flex items-center">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/5 flex items-center justify-center mr-3 border border-emerald-400/20 shadow-inner">
-                            <svg className="w-4 h-4 text-emerald-400 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center mr-3 border border-neutral-200/20 shadow-inner">
+                            <svg className="w-4 h-4 text-neutral-200 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                             </svg>
                           </div>

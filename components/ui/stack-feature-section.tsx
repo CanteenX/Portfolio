@@ -1,8 +1,7 @@
 "use client";
 
 import {
-  FaReact, FaAws, FaDocker, FaNodeJs, FaGithub,
-  FaTwitter, FaLinkedin, FaPython
+  FaReact, FaAws, FaDocker, FaNodeJs, FaGithub, FaPython
 } from "react-icons/fa";
 import {
   SiNextdotjs, SiVercel, SiRedux, SiTypescript,
@@ -19,8 +18,6 @@ const iconConfigs = [
   { Icon: SiRedux, color: "#764ABC", name: "Redux" },
   { Icon: SiTypescript, color: "#3178C6", name: "TypeScript" },
   { Icon: FaGithub, color: "#E6EDF3", name: "GitHub" },
-  { Icon: FaTwitter, color: "#1DA1F2", name: "Twitter" },
-  { Icon: FaLinkedin, color: "#0077B5", name: "LinkedIn" },
   { Icon: SiTailwindcss, color: "#06B6D4", name: "Tailwind" },
   { Icon: SiMongodb, color: "#47A248", name: "MongoDB" },
   { Icon: FaPython, color: "#3776AB", name: "Python" },
@@ -52,14 +49,14 @@ export default function FeatureSection() {
   const iconsPerOrbit = Math.ceil(iconConfigs.length / orbitCount);
 
   return (
-    <section className="relative max-w-6xl mx-auto my-32 pl-10 flex items-center justify-between h-[30rem] border border-white/10 bg-zinc-950 overflow-hidden rounded-3xl">
+    <section className="relative max-w-6xl mx-auto my-16 md:my-24 px-6 md:px-0 md:pl-10 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-0 py-12 md:py-0 md:h-[30rem] border border-white/10 bg-zinc-950 overflow-hidden rounded-3xl">
       <style dangerouslySetInnerHTML={{ __html: ORBIT_STYLES }} />
 
       {/* Left side: Heading and Text */}
-      <div className="w-1/2 z-10 text-left">
-        <h1 className="mb-4 text-white">
-          Build your idea
-        </h1>
+      <div className="w-full md:w-1/2 z-10 text-left">
+        <h2 className="mb-4 text-white">
+          Our Tech Stack
+        </h2>
         <p className="text-gray-300 mb-6 max-w-lg">
           Modern tech stack for AI and full-stack development with cutting-edge tools and frameworks.
         </p>
@@ -76,8 +73,8 @@ export default function FeatureSection() {
       </div>
 
       {/* Right side: Orbit animation */}
-      <div className="relative w-1/2 h-full flex items-center justify-start overflow-hidden">
-        <div className="relative w-[50rem] h-[50rem] translate-x-[50%] flex items-center justify-center">
+      <div className="relative w-full md:w-1/2 h-[22rem] md:h-full flex items-center justify-center md:justify-start overflow-hidden">
+        <div className="relative w-[50rem] h-[50rem] md:translate-x-[50%] flex items-center justify-center">
           {/* Center Circle */}
           <div className="w-24 h-24 rounded-full bg-zinc-900 border border-white/10 shadow-lg flex items-center justify-center">
             <FaReact className="w-12 h-12 text-blue-400" />

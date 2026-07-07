@@ -90,7 +90,7 @@ export function GlobePulse({
         mapSamples: 16000,
         mapBrightness: 10,
         baseColor: [0.5, 0.5, 0.5],
-        markerColor: [0.2, 0.8, 0.9],
+        markerColor: [0.9, 0.9, 0.9],
         glowColor: [0.05, 0.05, 0.05],
         markerElevation: 0,
         markers: markers.map((m) => ({
