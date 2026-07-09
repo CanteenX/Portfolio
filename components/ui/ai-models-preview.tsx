@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   AiChat02Icon,
@@ -21,6 +22,7 @@ type AiService = {
   features: string[];
   useCases: string[];
   tech: string[];
+  projectHref?: string;
 };
 
 const AI_SERVICES: AiService[] = [
@@ -70,7 +72,8 @@ const AI_SERVICES: AiService[] = [
       "Call routing & escalation",
     ],
     useCases: ["Appointment booking", "Order tracking", "Surveys & feedback", "Cold outreach"],
-    tech: ["Whisper", "TTS", "Twilio", "LLM orchestration"],
+    tech: ["LiveKit", "Gemini", "GoTo", "EHR API", "RingCentral"],
+    projectHref: "/projects/ai-call-bot-hospital",
   },
   {
     id: "ai-automation",
@@ -249,7 +252,7 @@ export function AiModelsList({ className = "" }: { models?: unknown; className?:
               </div>
 
               {/* Tech */}
-              <div>
+              <div className={selected.projectHref ? "mb-8" : ""}>
                 <h4 className="text-white/60 text-xs uppercase tracking-widest mb-3">
                   Tech Stack
                 </h4>
@@ -264,6 +267,16 @@ export function AiModelsList({ className = "" }: { models?: unknown; className?:
                   ))}
                 </div>
               </div>
+
+              {selected.projectHref && (
+                <Link
+                  href={selected.projectHref}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
+                  onClick={() => setSelected(null)}
+                >
+                  View case study →
+                </Link>
+              )}
             </motion.div>
           </motion.div>
         )}
