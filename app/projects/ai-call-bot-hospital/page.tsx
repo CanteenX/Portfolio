@@ -23,7 +23,7 @@ import {
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa";
 import type { IconType } from "react-icons";
-import type { LucideIcon } from "lucide-react";
+import type { LucideIcon, LucideProps } from "lucide-react";
 
 const IMG = {
   hero: "/projects/ai-call-bot-hospital/hero.jpg",
@@ -38,11 +38,11 @@ import { Navbar } from "@/components/ui/navbar";
 import { ContactCTA } from "@/components/ui/contact-cta";
 import { Footer } from "@/components/ui/footer";
 
-const RingCentralIcon: LucideIcon = (props) => (
+const RingCentralIcon = (props: LucideProps) => (
   <Phone {...props} strokeWidth={2.2} />
 );
 
-const EhrApiIcon: LucideIcon = (props) => (
+const EhrApiIcon = (props: LucideProps) => (
   <HeartPulse {...props} strokeWidth={2.2} />
 );
 
@@ -78,7 +78,7 @@ const screens = [
 
 const techStack: {
   name: string;
-  icon: IconType | LucideIcon;
+  icon: IconType | LucideIcon | ((props: LucideProps) => React.JSX.Element);
   color: string;
   desc: string;
 }[] = [
