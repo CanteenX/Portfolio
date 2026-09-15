@@ -8,7 +8,7 @@ import { getPublicSettings } from "@/lib/api";
 const FALLBACK = {
   brandName: "NVENTRA",
   description: "An elite engineering collective building high-performance web and mobile products for global brands.",
-  email: "deepmenta081@gmail.com",
+  email: "hello@umaeng.co.in",
   version: "v4.2 — STABLE_BUILD",
   links: [
     { label: "Work", href: "/work" },

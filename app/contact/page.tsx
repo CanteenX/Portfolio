@@ -41,8 +41,11 @@ function useLocalTime() {
   return time;
 }
 
-const FALLBACK_EMAIL = "deepmenta081@gmail.com";
-const FALLBACK_PHONE = "9173694508";
+// Company-owned, never a personal address or number. These render publicly on
+// any settings-fetch failure, so a personal contact here becomes the brand
+// advertised contact during an outage.
+const FALLBACK_EMAIL = "hello@umaeng.co.in";
+const FALLBACK_PHONE = "";
 const FALLBACK_SERVICES = [
   "App Development",
   "Website Building",
@@ -70,16 +73,24 @@ export default function ContactPage() {
   const services = settings?.services?.length ? settings.services : FALLBACK_SERVICES;
   const callSlots = settings?.callSlots?.length ? settings.callSlots : FALLBACK_CALL_SLOTS;
 
+  // The phone card is dropped entirely when no number is configured, rather
+  // than rendering an empty card with a dead tel: link.
   const infoCards = [
     { icon: Mail, label: "Email", value: email, href: `mailto:${email}` },
-    { icon: Phone, label: "Phone", value: phone, href: `tel:${phone.replace(/\s/g, "")}` },
+    ...(phone
+      ? [{ icon: Phone, label: "Phone", value: phone, href: `tel:${phone.replace(/\s/g, "")}` }]
+      : []),
   ];
 
   const [tab, setTab] = useState<"message" | "call">("call");
+  // callSlot was typed on ContactFormData, stored by the server and rendered in
+  // the admin detail pane, but was never in form state and the slot buttons had
+  // no onClick — so the field was empty end to end.
   const [formState, setFormState] = useState({
     name: "",
     email: "",
     service: "",
+    callSlot: "",
     message: "",
   });
   const [sending, setSending] = useState(false);
@@ -101,7 +112,7 @@ export default function ContactPage() {
     try {
       await submitContact(formState);
       setSent(true);
-      setFormState({ name: "", email: "", service: "", message: "" });
+      setFormState({ name: "", email: "", service: "", callSlot: "", message: "" });
     } catch {
       setSubmitError("Failed to send. Please try again.");
     } finally {
@@ -221,14 +232,29 @@ export default function ContactPage() {
                   </div>
 
                   <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-3 mb-10">
-                    {callSlots.map((slot) => (
-                      <button
-                        key={slot}
-                        className="text-[11px] font-mono py-4 border border-white/5 bg-zinc-900/50 rounded-xl hover:border-mint hover:text-mint transition-all text-zinc-400 capitalize"
-                      >
-                        {slot}
-                      </button>
-                    ))}
+                    {callSlots.map((slot) => {
+                      const isSelected = formState.callSlot === slot;
+                      return (
+                        <button
+                          key={slot}
+                          type="button"
+                          aria-pressed={isSelected}
+                          onClick={() =>
+                            setFormState((prev) => ({
+                              ...prev,
+                              callSlot: prev.callSlot === slot ? "" : slot,
+                            }))
+                          }
+                          className={
+                            isSelected
+                              ? "text-[11px] font-mono py-4 border rounded-xl transition-all capitalize border-mint text-mint bg-mint/5"
+                              : "text-[11px] font-mono py-4 border rounded-xl transition-all capitalize border-white/5 bg-zinc-900/50 text-zinc-400 hover:border-mint hover:text-mint"
+                          }
+                        >
+                          {slot}
+                        </button>
+                      );
+                    })}
                   </div>
 
                   <a
