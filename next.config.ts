@@ -4,6 +4,19 @@ const ADMIN_ORIGIN = process.env.ADMIN_PROXY_ORIGIN;
 const API_ORIGIN = process.env.API_PROXY_ORIGIN;
 
 const nextConfig: NextConfig = {
+  images: {
+    /**
+     * next/image refuses remote hosts it has not been told about. Without this
+     * the CMS images — which now live on the Supabase CDN — could not be
+     * optimised at all, so every one of them stayed a raw <img>.
+     */
+    remotePatterns: [
+      { protocol: "https", hostname: "zqcltxlpfnwklxtdefok.supabase.co", pathname: "/storage/v1/object/public/**" },
+      // Legacy seed content still references Unsplash.
+      { protocol: "https", hostname: "images.unsplash.com" }
+    ]
+  },
+
   async rewrites() {
     const rules: Awaited<ReturnType<NonNullable<NextConfig["rewrites"]>>> = [];
 
@@ -22,6 +35,20 @@ const nextConfig: NextConfig = {
     }
 
     return rules;
+  },
+
+  /**
+   * /projects and /work were duplicate indexes of the same CMS data, splitting
+   * link equity between two near-identical pages. A 308 keeps every existing
+   * link — including ones in old proposal decks — working, and tells crawlers
+   * which is canonical. A canonical tag alone would leave both crawlable.
+   *
+   * Exact source, so /projects/<slug> detail routes are untouched.
+   */
+  async redirects() {
+    return [
+      { source: "/projects", destination: "/work", permanent: true }
+    ];
   },
 
   /**

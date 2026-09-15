@@ -17,6 +17,12 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: Metadata
   { path: "/team", priority: 0.7, changeFrequency: "monthly" },
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },
   { path: "/contact", priority: 0.6, changeFrequency: "monthly" },
+  // Three hardcoded case studies with no CMS row. They are not derived below
+  // with the CMS projects, so without these entries the sitemap omits the
+  // strongest work on the site.
+  { path: "/projects/ai-attendance", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/projects/ai-call-bot-hospital", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/projects/business-meet", priority: 0.8, changeFrequency: "monthly" },
   // Low priority but present: a crawlable privacy policy is a requirement for
   // Google Ads and Meta, and procurement reviewers look for it directly.
   { path: "/privacy", priority: 0.2, changeFrequency: "yearly" },
