@@ -16,7 +16,11 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: Metadata
   { path: "/how-we-work", priority: 0.7, changeFrequency: "monthly" },
   { path: "/team", priority: 0.7, changeFrequency: "monthly" },
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },
-  { path: "/contact", priority: 0.6, changeFrequency: "monthly" }
+  { path: "/contact", priority: 0.6, changeFrequency: "monthly" },
+  // Low priority but present: a crawlable privacy policy is a requirement for
+  // Google Ads and Meta, and procurement reviewers look for it directly.
+  { path: "/privacy", priority: 0.2, changeFrequency: "yearly" },
+  { path: "/terms", priority: 0.2, changeFrequency: "yearly" }
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

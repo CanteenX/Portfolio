@@ -113,9 +113,20 @@ export type PortfolioSettings = {
 export type ContactFormData = {
   name: string;
   email: string;
+  phone?: string;
+  company?: string;
   service?: string;
+  budgetBand?: string;
+  timeline?: string;
   callSlot?: string;
   message: string;
+  /** Verbatim wording the visitor agreed to; stored server-side as evidence. */
+  consentText?: string;
+  /**
+   * Honeypot. Always submitted empty by a real browser — the field is hidden
+   * and out of the tab order — so the server treats a filled value as a bot.
+   */
+  website?: string;
 };
 
 // ── API functions ─────────────────────────────────────────────────────────────

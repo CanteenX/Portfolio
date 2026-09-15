@@ -1,5 +1,6 @@
 "use client";
 
+import { CONSENT_TEXT } from "@/lib/legal";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
@@ -46,6 +47,55 @@ function useLocalTime() {
 // advertised contact during an outage.
 const FALLBACK_EMAIL = "hello@umaeng.co.in";
 const FALLBACK_PHONE = "";
+
+const FIELD_CLASS =
+  "w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-mint/30 focus:ring-1 focus:ring-mint/10 transition-all";
+
+/**
+ * Label + control, with the association actually made.
+ *
+ * Every label on this form previously rendered as a bare styled <label> with no
+ * htmlFor and no id on its input — a WCAG 1.3.1 / 4.1.2 failure on the one page
+ * that generates revenue. A screen-reader user heard three unnamed fields, and
+ * browser autofill had nothing to match on.
+ */
+function Field({
+  id,
+  label,
+  children
+}: {
+  id: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-3">
+      <label
+        htmlFor={id}
+        className="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 ml-1"
+      >
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+/** Coarse on purpose: a band is a click, an exact figure is a negotiation. */
+const BUDGET_OPTIONS = [
+  "Under ₹2L",
+  "₹2L – ₹5L",
+  "₹5L – ₹15L",
+  "₹15L+",
+  "Not sure yet"
+];
+
+const TIMELINE_OPTIONS = [
+  "As soon as possible",
+  "1–3 months",
+  "3–6 months",
+  "Just exploring"
+];
 const FALLBACK_SERVICES = [
   "App Development",
   "Website Building",
@@ -89,14 +139,22 @@ export default function ContactView({ initialSettings }: { initialSettings: Port
   const [formState, setFormState] = useState({
     name: "",
     email: "",
+    phone: "",
+    company: "",
     service: "",
+    budgetBand: "",
+    timeline: "",
     callSlot: "",
     message: "",
+    // Honeypot: hidden from people, irresistible to form bots.
+    website: "",
   });
+  const [consented, setConsented] = useState(false);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
   const time = useLocalTime();
 
   const handleChange = (
@@ -110,11 +168,32 @@ export default function ContactView({ initialSettings }: { initialSettings: Port
     setSending(true);
     setSubmitError("");
     try {
-      await submitContact(formState);
+      await submitContact({
+        ...formState,
+        // Sent only when actually ticked: the server timestamps consent on the
+        // presence of this text, so sending it unconditionally would record a
+        // consent nobody gave.
+        consentText: consented ? CONSENT_TEXT : "",
+      });
       setSent(true);
-      setFormState({ name: "", email: "", service: "", callSlot: "", message: "" });
+      setFormState({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        service: "",
+        budgetBand: "",
+        timeline: "",
+        callSlot: "",
+        message: "",
+        website: "",
+      });
+      setConsented(false);
     } catch {
       setSubmitError("Failed to send. Please try again.");
+      // Move focus to the error so a screen-reader user is told the submit
+      // failed, instead of being left on a button that silently did nothing.
+      requestAnimationFrame(() => errorRef.current?.focus());
     } finally {
       setSending(false);
     }
@@ -257,15 +336,27 @@ export default function ContactView({ initialSettings }: { initialSettings: Port
                     })}
                   </div>
 
-                  <a
-                    href="https://cal.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  {/*
+                    This was an <a> to https://cal.com — the vendor's own
+                    marketing homepage, not a booking page. The default tab of
+                    the only conversion page on the site therefore had no way to
+                    convert, and its single CTA sent traffic to a third party.
+                    It now carries the chosen slot into the enquiry form, which
+                    is a real submission that reaches a real inbox.
+                  */}
+                  <button
+                    type="button"
+                    onClick={() => setTab("message")}
                     className="group inline-flex items-center gap-3 px-12 py-5 rounded-full bg-white text-black font-bold hover:scale-105 active:scale-95 transition-all shadow-xl"
                   >
-                    View All Availability
+                    {formState.callSlot ? `Request ${formState.callSlot}` : "Request a Call"}
                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                  </a>
+                  </button>
+                  {!formState.callSlot && (
+                    <p className="mt-4 text-xs text-zinc-500 font-mono">
+                      Pick a slot above, or continue and tell us what suits you.
+                    </p>
+                  )}
 
                   <div className="mt-12 flex items-center gap-4 text-xs text-zinc-500 font-mono">
                     <div className="flex items-center gap-2">
@@ -307,34 +398,66 @@ export default function ContactView({ initialSettings }: { initialSettings: Port
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 ml-1">
-                            Full Name
-                          </label>
+                        <Field id="contact-name" label="Full Name">
                           <input
+                            id="contact-name"
                             type="text"
                             name="name"
                             required
+                            autoComplete="name"
                             value={formState.name}
                             onChange={handleChange}
                             placeholder="John Doe"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-mint/30 focus:ring-1 focus:ring-mint/10 transition-all"
+                            className={FIELD_CLASS}
                           />
-                        </div>
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 ml-1">
-                            Email Address
-                          </label>
+                        </Field>
+                        <Field id="contact-email" label="Email Address">
                           <input
+                            id="contact-email"
                             type="email"
                             name="email"
                             required
+                            autoComplete="email"
                             value={formState.email}
                             onChange={handleChange}
                             placeholder="john@company.com"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-mint/30 focus:ring-1 focus:ring-mint/10 transition-all"
+                            className={FIELD_CLASS}
                           />
-                        </div>
+                        </Field>
+                      </div>
+
+                      {/*
+                        Qualification fields, all optional. Asking for a phone
+                        number and a budget band is what separates an enquiry
+                        that can be triaged and called back from a name and a
+                        paragraph — but making any of them required would cost
+                        more leads than the extra detail is worth.
+                      */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Field id="contact-phone" label="Phone (optional)">
+                          <input
+                            id="contact-phone"
+                            type="tel"
+                            name="phone"
+                            autoComplete="tel"
+                            value={formState.phone}
+                            onChange={handleChange}
+                            placeholder="+91 98765 43210"
+                            className={FIELD_CLASS}
+                          />
+                        </Field>
+                        <Field id="contact-company" label="Company (optional)">
+                          <input
+                            id="contact-company"
+                            type="text"
+                            name="company"
+                            autoComplete="organization"
+                            value={formState.company}
+                            onChange={handleChange}
+                            placeholder="Acme Inc."
+                            className={FIELD_CLASS}
+                          />
+                        </Field>
                       </div>
 
                       <CustomSelect
@@ -347,23 +470,86 @@ export default function ContactView({ initialSettings }: { initialSettings: Port
                         placeholder="Select a category"
                       />
 
-                      <div className="space-y-3">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 ml-1">
-                          Project Details
-                        </label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <CustomSelect
+                          label="Indicative Budget (optional)"
+                          value={formState.budgetBand}
+                          onChange={(val) =>
+                            setFormState((prev) => ({ ...prev, budgetBand: val }))
+                          }
+                          options={BUDGET_OPTIONS}
+                          placeholder="Select a range"
+                        />
+                        <CustomSelect
+                          label="Timeline (optional)"
+                          value={formState.timeline}
+                          onChange={(val) =>
+                            setFormState((prev) => ({ ...prev, timeline: val }))
+                          }
+                          options={TIMELINE_OPTIONS}
+                          placeholder="When do you want to start?"
+                        />
+                      </div>
+
+                      <Field id="contact-message" label="Project Details">
                         <textarea
+                          id="contact-message"
                           name="message"
                           required
                           rows={6}
                           value={formState.message}
                           onChange={handleChange}
                           placeholder="Objectives, timeframe, and technical requirements..."
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-mint/30 focus:ring-1 focus:ring-mint/10 transition-all resize-none"
+                          className={`${FIELD_CLASS} resize-none`}
+                        />
+                      </Field>
+
+                      {/*
+                        Honeypot. Hidden from sighted users, from screen readers
+                        (aria-hidden) and from the keyboard (tabIndex -1), so no
+                        real visitor can fill it in by accident. Not `display:
+                        none`, which many bots skip.
+                      */}
+                      <div className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+                        <label htmlFor="contact-website">Leave this field empty</label>
+                        <input
+                          id="contact-website"
+                          type="text"
+                          name="website"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          value={formState.website}
+                          onChange={handleChange}
                         />
                       </div>
 
+                      <div className="flex items-start gap-3">
+                        <input
+                          id="contact-consent"
+                          type="checkbox"
+                          required
+                          checked={consented}
+                          onChange={(e) => setConsented(e.target.checked)}
+                          className="mt-1 size-4 shrink-0 accent-mint"
+                        />
+                        <label htmlFor="contact-consent" className="text-xs leading-relaxed text-zinc-400">
+                          {CONSENT_TEXT}{" "}
+                          <Link href="/privacy" className="text-mint underline hover:no-underline">
+                            Read the Privacy Policy
+                          </Link>
+                          .
+                        </label>
+                      </div>
+
                       {submitError && (
-                        <p className="text-red-400 text-sm font-mono">{submitError}</p>
+                        <p
+                          ref={errorRef}
+                          tabIndex={-1}
+                          role="alert"
+                          className="text-red-400 text-sm font-mono outline-none"
+                        >
+                          {submitError}
+                        </p>
                       )}
 
                       <button

@@ -68,6 +68,20 @@ export function Footer() {
       <div className="border-t hairline">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between gap-4 font-mono text-sm text-zinc-500 tracking-widest uppercase">
           <span>© {new Date().getFullYear()} {brandName}. All rights reserved.</span>
+          {/*
+            Legal links live in the footer on every page because that is where a
+            procurement reviewer and a privacy-conscious visitor both look for
+            them, and because Google Ads and Meta both require a reachable
+            privacy policy on the landing domain.
+          */}
+          <span className="flex items-center gap-4">
+            <Link href="/privacy" className="hover:text-mint transition-colors">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-mint transition-colors">
+              Terms
+            </Link>
+          </span>
           <span className="flex items-center gap-2">
             <span className="size-1.5 bg-mint animate-pulse" />
             All systems operational
