@@ -9,13 +9,39 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL ??
   (process.env.NODE_ENV === "production" ? "" : "http://localhost:7002");
 
+/**
+ * Base URL for requests issued during server rendering.
+ *
+ * In the browser an empty baseURL is exactly right: the page is served from the
+ * same origin as /api, so a relative request hits the Next rewrite. On the
+ * server there is no origin to be relative to — axios on Node cannot resolve
+ * "/api/v1/..." and throws, which every caller catches and turns into fallback
+ * content. That silently undoes server-side rendering of CMS data, and it only
+ * shows up in production, where NEXT_PUBLIC_API_URL is unset.
+ *
+ * API_PROXY_ORIGIN is the backend the rewrites already point at, so reuse it
+ * and skip the round trip back through our own edge.
+ */
+const SERVER_API_URL =
+  process.env.API_PROXY_ORIGIN ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:7002");
+
+const isServer = typeof window === "undefined";
+
+export function resolveApiBaseUrl(): string {
+  return isServer ? SERVER_API_URL : API_URL;
+}
+
 export function resolveImageUrl(path: string | undefined | null): string {
   if (!path) return "";
   if (path.startsWith("http")) return path;
+  // Deliberately the browser base, not the server one: this string ends up in
+  // an <img src> that the visitor resolves, so it must stay same-origin.
   return `${API_URL}${path}`;
 }
 
-export const apiClient = axios.create({ baseURL: API_URL, timeout: 10000 });
+export const apiClient = axios.create({ baseURL: resolveApiBaseUrl(), timeout: 10000 });
 
 // ── Types matching server responses ──────────────────────────────────────────
 
