@@ -102,10 +102,17 @@ export default function Page() {
       </section>
 
       <section>
-        <h2>Cookies</h2>
+        <h2>Cookies and analytics</h2>
         <p>
-          This website sets no advertising or analytics cookies. If that changes we will update this
-          policy and ask for your consent before setting them.
+          This website sets <strong>no cookies</strong> — no advertising cookies, no analytics
+          cookies, and no cross-site trackers.
+        </p>
+        <p>
+          We measure aggregate traffic using Vercel Web Analytics and Vercel Speed Insights. These
+          are cookieless: they record page views and performance timings without storing an
+          identifier on your device and without building a profile of you. That is why this site
+          shows no cookie consent banner — there is nothing to consent to. If we ever adopt a
+          technology that does need consent, we will ask before enabling it and update this page.
         </p>
       </section>
     </LegalPage>

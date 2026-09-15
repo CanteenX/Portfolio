@@ -3,6 +3,7 @@
 import { useEffect, useRef, ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -24,10 +25,18 @@ export function ScrollReveal({
   duration = 1,
 }: ScrollRevealProps) {
   const elementRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const element = elementRef.current;
     if (!element) return;
+
+    // Content must still be VISIBLE — the animation starts from opacity 0, so
+    // simply skipping it would leave the whole page blank for these users.
+    if (reducedMotion) {
+      gsap.set(element, { opacity: 1, x: 0, y: 0 });
+      return;
+    }
 
     // Initial state based on direction
     const initialState: any = {
@@ -77,7 +86,7 @@ export function ScrollReveal({
         }
       });
     };
-  }, [delay, direction, duration]);
+  }, [delay, direction, duration, reducedMotion]);
 
   return (
     <div ref={elementRef} className={className}>

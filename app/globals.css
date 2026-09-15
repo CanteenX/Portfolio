@@ -194,3 +194,26 @@ body {
 .animate-spotlight {
   animation: spotlight 2s ease .75s 1 forwards;
 }
+
+/*
+ * Global reduced-motion backstop.
+ *
+ * The JS hooks handle Lenis and the GSAP reveals, but plenty of motion here is
+ * pure CSS (marquees, pulses, hover transforms) and more gets added over time.
+ * This catches all of it, including anything shipped before someone remembers
+ * the hook exists.
+ *
+ * Durations are near-zero rather than `none`: a transition that is removed
+ * entirely can leave elements stuck mid-state, whereas one that completes
+ * instantly still fires transitionend and settles correctly.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
