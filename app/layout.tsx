@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { buildOrganisationGraph, serialiseJsonLd } from "@/lib/structured-data";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -48,6 +49,15 @@ export default function RootLayout({
       className={`${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
+        {/*
+          Organisation + WebSite graph, emitted once for the whole site. Rendered
+          from a server component so it is in the initial HTML, which is the only
+          version a crawler parses.
+        */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serialiseJsonLd(buildOrganisationGraph()) }}
+        />
         {children}
         <Analytics />
         <SpeedInsights />
