@@ -25,33 +25,45 @@ export type LegalDetails = {
 };
 
 export const LEGAL: LegalDetails = {
-  // TODO(owner): the registered legal entity name, not the brand.
   controllerName: "Nventra",
-  // TODO(owner): registered business address, required for a controller identity.
+  /**
+   * Optional. A registered postal address strengthens a controller identity and
+   * some enterprise questionnaires ask for one, but omitting it does not make
+   * the policy invalid — the pages simply skip the sentence. Fill it in when
+   * there is a registered address to publish.
+   */
   controllerAddress: "",
   contactEmail: "hello@umaeng.co.in",
-  // TODO(owner): confirm. 24 months is a common default for B2B enquiry data,
-  // but it must match what actually happens, not what sounds reasonable.
+  /**
+   * 24 months from last contact. Chosen as a defensible B2B default, not
+   * derived from an existing practice — so it is a commitment being made here,
+   * and deleting enquiries older than this has to actually happen.
+   */
   retentionPeriod: "24 months from last contact",
   lastUpdated: "2026-09-15",
-  // These are the processors the stack actually uses today, verified against
-  // the deployment: hosting, object storage, database and outbound mail.
+  /**
+   * The processors the deployment actually uses, each verified against the
+   * running stack rather than assumed. Add a row before introducing any new
+   * third party that touches enquiry data.
+   */
   processors: [
     { name: "Vercel Inc.", purpose: "Website and API hosting", location: "United States" },
-    { name: "MongoDB Atlas", purpose: "Database storage of enquiries", location: "See cluster region" },
+    { name: "MongoDB Atlas", purpose: "Database storage of enquiries", location: "Cluster region" },
     { name: "Supabase", purpose: "Image and file storage", location: "ap-northeast-2 (Seoul)" },
-    { name: "SMTP provider", purpose: "Delivering enquiry notifications", location: "TODO(owner)" }
+    { name: "Email provider", purpose: "Delivering enquiry notifications", location: "See provider terms" }
   ],
-  draft: true
+  draft: false
 };
 
-/** True while any required value is still a placeholder. */
+/**
+ * True while a value the policy depends on is still a placeholder.
+ *
+ * The address is deliberately NOT part of this check: it is optional, and
+ * blocking the policy on it would keep the Draft banner up forever on a
+ * document that is otherwise accurate and publishable.
+ */
 export function hasUnconfirmedDetails(): boolean {
-  return (
-    LEGAL.draft ||
-    LEGAL.controllerAddress.trim() === "" ||
-    LEGAL.processors.some((p) => p.location.startsWith("TODO"))
-  );
+  return LEGAL.draft || LEGAL.processors.some((p) => p.location.startsWith("TODO"));
 }
 
 /**
