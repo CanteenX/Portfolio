@@ -7,7 +7,9 @@ import { getPublicSettings } from "@/lib/api";
 
 const FALLBACK_BRAND = "NVENTRA";
 const FALLBACK_LINKS = [
-  { label: "Work", href: "/projects" },
+  // /work, not /projects: the latter now 308s here, and sending every visitor
+  // through a redirect on the primary nav link is a wasted round trip.
+  { label: "Work", href: "/work" },
   { label: "Services", href: "/services" },
   { label: "Process", href: "/how-we-work" },
   { label: "Team", href: "/team" },
