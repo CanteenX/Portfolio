@@ -1,26 +1,23 @@
-import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo";
 import { getPublicSettings } from "@/lib/api";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
 import ServicesView from "./view";
 
 const TITLE = "Services";
 const DESCRIPTION =
   "App development, website building, CRM and admin panels, and SEO — delivered by a senior engineering collective.";
-const PATH = "/services";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: PATH },
-  openGraph: {
-    title: `${TITLE} — ${SITE_NAME}`,
-    description: DESCRIPTION,
-    url: `${SITE_URL}${PATH}`,
-    type: "website",
-    siteName: SITE_NAME,
-  },
-  twitter: { card: "summary_large_image", title: `${TITLE} — ${SITE_NAME}`, description: DESCRIPTION },
-};
+/**
+ * Metadata composed from the SEO Manager row for this route, falling back to
+ * the constants above. Never throws — the shipped copy is the floor.
+ */
+export function generateMetadata() {
+  return buildPageMetadata({
+    slug: "/services",
+    defaultTitle: TITLE,
+    defaultDescription: DESCRIPTION,
+    ogType: "website"
+  });
+}
 
 /**
  * Re-fetched hourly: the copy on this page is CMS-editable, so a build-time

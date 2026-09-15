@@ -1,24 +1,23 @@
-import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo";
 import { LegalPage } from "@/components/ui/legal-page";
 import { LEGAL } from "@/lib/legal";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 const TITLE = "Privacy Policy";
 const DESCRIPTION =
   "How Nventra collects, uses, stores and deletes the personal data you provide through this website.";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/privacy" },
-  openGraph: {
-    title: `${TITLE} — ${SITE_NAME}`,
-    description: DESCRIPTION,
-    url: `${SITE_URL}/privacy`,
-    type: "website",
-    siteName: SITE_NAME
-  }
-};
+/**
+ * Metadata composed from the SEO Manager row for this route, falling back to
+ * the constants above. Never throws — the shipped copy is the floor.
+ */
+export function generateMetadata() {
+  return buildPageMetadata({
+    slug: "/privacy",
+    defaultTitle: TITLE,
+    defaultDescription: DESCRIPTION,
+    ogType: "website"
+  });
+}
 
 export default function Page() {
   return (
