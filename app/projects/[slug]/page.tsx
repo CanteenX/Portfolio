@@ -47,7 +47,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = `${SITE_URL}/projects/${slug}`;
 
   return {
-    title,
+    // Absolute: the title already ends in the site name, and the layout's
+    // `%s — Nventra` template would otherwise append it a second time — the
+    // live page was serving "Data Setu — Nventra — Nventra".
+    title: { absolute: title },
     description,
     alternates: { canonical: url },
     openGraph: {
