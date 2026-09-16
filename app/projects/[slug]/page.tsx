@@ -19,7 +19,10 @@ type Props = { params: Promise<{ slug: string }> };
  * upstream requests for every case study render.
  */
 const resolveProject = cache(async (slug: string): Promise<ApiProject | null> => {
-  const fromCms = await getPublicProjectBySlug(slug).catch(() => null);
+  // Deliberately NOT caught: getPublicProjectBySlug returns null for a real
+  // 404 and throws for anything else, and swallowing that here would put
+  // back the bug where a transient failure caches a 404 over a live page.
+  const fromCms = await getPublicProjectBySlug(slug);
   if (fromCms) return fromCms;
   const bundled = getProject(slug);
   return bundled ? toApiProject(bundled) : null;

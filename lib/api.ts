@@ -363,12 +363,25 @@ export async function getPublicCategories(): Promise<string[]> {
   }
 }
 
+/**
+ * Returns null ONLY when the API says the slug does not exist.
+ *
+ * Swallowing every error here caused a live outage of the case studies: a
+ * timeout or a 5xx looked identical to a genuine 404, the page called
+ * notFound(), and Next cached that 404 for the whole revalidate window. A
+ * two-second backend blip could take the site's best-ranking URL offline for
+ * an hour, and it self-healed just slowly enough to look like a cache quirk.
+ *
+ * Anything that is not a 404 now propagates, so the render fails loudly and is
+ * retried instead of being cached as a permanent absence.
+ */
 export async function getPublicProjectBySlug(slug: string): Promise<ApiProject | null> {
   try {
     const { data } = await apiClient.get<ApiProject>(`/api/v1/public/portfolio/projects/${slug}`);
     return data;
-  } catch {
-    return null;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) return null;
+    throw error;
   }
 }
 
