@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import {
   getPublicProjectBySlug,
   getPublicTechStacks,
@@ -9,9 +10,10 @@ import {
   type ApiProject,
   type ApiTechStack,
   type RoiItem,
+  type PortfolioSettings
 } from "@/lib/api";
-import { getProject } from "@/lib/projects";
-import type { Project } from "@/lib/projects";
+import { TECH_ICONS } from "@/lib/tech-icons";
+import { getProject, toApiProject } from "@/lib/projects";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
@@ -37,69 +39,147 @@ import {
   Rocket,
   Code2,
   Cpu,
+  ScanFace,
+  MapPin,
+  Activity,
+  LayoutDashboard,
+  Smartphone,
+  Database,
+  Calendar,
+  HeartPulse,
+  Phone,
+  Sparkles,
+  Plane,
+  MessageSquare,
+  Search,
+  Bell,
+  Lock,
+  Gauge,
 } from "lucide-react";
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Clock, TrendingUp, Star, Building2, Zap, CheckCircle2, Shield, Globe,
   Layers, Award, Users, BarChart, DollarSign, Timer, Target, Rocket, Code2, Cpu,
+  ScanFace, MapPin, Activity, LayoutDashboard, Smartphone, Database, Calendar,
+  HeartPulse, Phone, Sparkles, Plane, MessageSquare, Search, Bell, Lock, Gauge,
 };
 
-function adaptStaticProject(p: Project): ApiProject {
+/**
+ * Accent colours the CMS may pick from, by name.
+ *
+ * A fixed map rather than a free-text class, because Tailwind compiles the
+ * classes it can see in source — a class assembled from a database string
+ * (`text-${accent}-400`) is not in the output CSS and silently renders as no
+ * colour at all. Listing them here is also what keeps arbitrary CSS from the
+ * database out of the page.
+ */
+const ACCENT_MAP: Record<string, string> = {
+  blue: "text-blue-400",
+  emerald: "text-emerald-400",
+  rose: "text-rose-400",
+  amber: "text-amber-400",
+  violet: "text-violet-400",
+  purple: "text-purple-400",
+  indigo: "text-indigo-400",
+  cyan: "text-cyan-400",
+  orange: "text-orange-400",
+  pink: "text-pink-400",
+  lime: "text-lime-400",
+  sky: "text-sky-400",
+  neutral: "text-neutral-200",
+};
+
+const DEFAULT_ACCENT = "text-neutral-200";
+
+/**
+ * Per-section copy: the project's own wording when it has one, the generic
+ * wording otherwise.
+ *
+ * The defaults are exactly the strings this page hardcoded before B-4, so a
+ * project with no `sectionHeadings` renders byte-identically to how it did.
+ */
+function heading(
+  project: ApiProject,
+  key: keyof NonNullable<ApiProject["sectionHeadings"]>,
+  fallback: { eyebrow: string; title: string; lead?: string }
+): { eyebrow: string; title: string; lead: string } {
+  const custom = project.sectionHeadings?.[key];
   return {
-    _id: p.slug,
-    slug: p.slug,
-    title: p.title,
-    category: p.category,
-    metric: p.metric,
-    year: p.year,
-    image: p.image,
-    client: p.client,
-    timeframe: p.timeframe,
-    role: p.role,
-    stack: p.stack,
-    techStack: p.stack,
-    liveUrl: undefined,
-    githubUrl: undefined,
-    problem: p.problem,
-    solution: p.solution,
-    features: p.features,
-    gallery: p.gallery,
-    roi: p.roi.map((text) => ({ value: text, label: "", description: "", icon: "" })),
-    roiSectionDescription: "",
-    screens: [],
-    workflowSteps: [],
-    stackSectionDescription: "",
-    codeSnippet: p.codeSnippet,
-    architecture: p.architecture,
-    isActive: true,
-    order: 0,
+    eyebrow: custom?.eyebrow?.trim() || fallback.eyebrow,
+    title: custom?.title?.trim() || fallback.title,
+    lead: custom?.lead?.trim() || fallback.lead || "",
   };
 }
 
-export default function ProjectDetailsPage() {
+/**
+ * A technology's mark: its brand glyph in its brand colour when the master row
+ * names one, the uploaded image next, and a neutral code glyph last.
+ *
+ * The colour is applied inline because it is a per-brand hex, not one of a
+ * handful of theme tokens — React's cyan is not a design decision this site
+ * gets to make. It is validated as `#rrggbb` on write, so it cannot carry
+ * anything but a colour.
+ */
+function TechGlyph({ tech }: { tech: ApiTechStack }) {
+  // Brand marks first, then the generic set — "EHR API" has no brand glyph but
+  // a heart-pulse reads correctly, and that is what the hand-built page used.
+  const BrandIcon = tech.icon ? (TECH_ICONS[tech.icon] ?? ICON_MAP[tech.icon]) : undefined;
+
+  if (BrandIcon) {
+    return <BrandIcon size={28} style={tech.color ? { color: tech.color } : undefined} />;
+  }
+  if (tech.image) {
+    return (
+      <img src={resolveImageUrl(tech.image)} alt={tech.name} className="w-8 h-8 object-contain" />
+    );
+  }
+  return <Code2 className="w-7 h-7 text-neutral-200" />;
+}
+
+/**
+ * `initialProject` is what the server shell already resolved. It is required in
+ * practice — the shell 404s when there is no case study — so the page renders
+ * fully on the first paint instead of flashing a spinner, and the copy is in
+ * the HTML for crawlers that do not run JavaScript.
+ */
+export default function ProjectDetailsPage({
+  initialProject = null,
+  initialSettings = null
+}: {
+  initialProject?: ApiProject | null;
+  // Seeded from the server shell so the nav and footer render CMS copy in the
+  // server HTML rather than flashing FALLBACK_BRAND after hydration. These are
+  // the site's highest-value URLs; a crawler must not read the fallback nav.
+  initialSettings?: PortfolioSettings | null;
+}) {
   const { slug } = useParams();
-  const [project, setProject] = useState<ApiProject | null | undefined>(undefined);
+  const [project, setProject] = useState<ApiProject | null | undefined>(
+    initialProject ?? undefined
+  );
   const [techStackMaster, setTechStackMaster] = useState<ApiTechStack[]>([]);
   const [activeScreen, setActiveScreen] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      getPublicProjectBySlug(slug as string),
-      getPublicTechStacks(),
-    ]).then(([data, stacks]) => {
-      setTechStackMaster(stacks);
-      if (data) {
-        setProject(data);
-      } else {
-        const staticP = getProject(slug as string);
-        setProject(staticP ? adaptStaticProject(staticP) : null);
-      }
-    }).catch(() => {
-      const staticP = getProject(slug as string);
-      setProject(staticP ? adaptStaticProject(staticP) : null);
-    });
-  }, [slug]);
+    // Tech stack masters carry the brand glyphs and are not part of the project
+    // document, so they are still fetched here. The project itself is re-fetched
+    // only when the server did not supply one.
+    getPublicTechStacks()
+      .then(setTechStackMaster)
+      .catch(() => setTechStackMaster([]));
+
+    if (initialProject) return;
+
+    getPublicProjectBySlug(slug as string)
+      .then((data) => {
+        const bundled = getProject(slug as string);
+        setProject(data ?? (bundled ? toApiProject(bundled) : null));
+      })
+      .catch(() => {
+        const bundled = getProject(slug as string);
+        setProject(bundled ? toApiProject(bundled) : null);
+      });
+  }, [slug, initialProject]);
 
   useEffect(() => {
     if (!project || project.screens.length === 0 || isPaused) return;
@@ -121,7 +201,7 @@ export default function ProjectDetailsPage() {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
         <h1 className="text-4xl font-bold mb-4">Project Not Found</h1>
-        <a href="/work" className="text-white hover:underline">Back to Work</a>
+        <Link href="/work" className="text-white hover:underline">Back to Work</Link>
       </div>
     );
   }
@@ -134,49 +214,100 @@ export default function ProjectDetailsPage() {
     ? matchedTechStacks
     : project.techStack.map((name) => ({ _id: name, name, image: "", description: "", isActive: true, order: 0 }));
 
+  // A project may label its own hero cells — "Scale: 8,000+ daily users" reads
+  // as nothing a "Timeframe" column could hold. Falls back to the fixed
+  // quartet, which is what every existing project renders.
+  const heroMeta =
+    project.heroMeta && project.heroMeta.length > 0
+      ? project.heroMeta.filter((m) => m.label || m.value)
+      : [
+          { label: "Client", value: project.client || "—" },
+          { label: "Timeframe", value: project.timeframe || "—" },
+          { label: "Role", value: project.role || "—" },
+          { label: "Outcome", value: project.metric || "—" },
+        ];
+
+  const screenPrefix = project.screenLabelPrefix?.trim() || "Screen";
+
+  // Four columns when the stack divides evenly into four and not into five, so
+  // an eight-technology stack reads as 4+4 rather than 5+3. Only these two
+  // literals exist, because Tailwind cannot compile a column count assembled at
+  // runtime.
+  const stackColumns =
+    displayTechStacks.length % 5 !== 0 && displayTechStacks.length % 4 === 0
+      ? "md:grid-cols-4"
+      : "md:grid-cols-5";
+
+  const stackCopy = heading(project, "stack", {
+    eyebrow: "/the_stack",
+    title: "Engineered for accuracy.",
+  });
+  const roiCopy = heading(project, "roi", { eyebrow: "/the_roi", title: "Tangible impact." });
+  const problemCopy = heading(project, "problem", {
+    eyebrow: "/the_problem",
+    title: "The challenge.",
+  });
+  const solutionCopy = heading(project, "solution", {
+    eyebrow: "/the_solution",
+    title: "Our approach.",
+  });
+  const screensCopy = heading(project, "screens", {
+    eyebrow: "/interface",
+    title: "Product in action.",
+  });
+  const featuresCopy = heading(project, "features", {
+    eyebrow: "/intelligence",
+    title: "Intelligence layers.",
+    lead: "Behind the simple interface lies a complex network of systems working in concert.",
+  });
+  const workflowCopy = heading(project, "workflow", {
+    eyebrow: "/the_workflow",
+    title: "How we built it.",
+  });
+
   return (
     <SmoothScroll>
       <main className="min-h-screen w-full bg-black text-white selection:bg-white/20">
-        <Navbar />
+        <Navbar initialSettings={initialSettings} />
 
-        {/* Glassmorphism page header */}
-        <div className="relative h-64 md:h-80 w-full overflow-hidden bg-zinc-950">
-          {project.image && (
-            <img src={resolveImageUrl(project.image)} alt={project.title} className="absolute inset-0 w-full h-full object-cover opacity-20" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
-          <div className="absolute inset-x-0 bottom-0 px-6 md:px-12 pb-10">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-mono-tag text-mint mb-3">{project.category ?? "Project"}</div>
-              <h1 className="text-4xl md:text-6xl font-semibold tracking-tighter text-white">{project.title}</h1>
-            </div>
-          </div>
-        </div>
+        {/*
+          There is no banner band above the hero. One used to sit here, repeating
+          the category and the title over a dimmed copy of the hero image — which
+          put two <h1> elements on every case study and pushed the real hero
+          below the fold. The hero below carries all three.
+        */}
 
         {/* ── HERO ── */}
         <section className="pt-28 pb-16 px-6">
           <div className="max-w-7xl mx-auto">
             <ScrollReveal direction="up">
-              <button
-                onClick={() => window.history.back()}
+              {/*
+                A real link, not `history.back()`: it is the only route out of a
+                case study for a visitor who arrived from search, and a crawler
+                follows it to the rest of the work. It points at /work because
+                /projects answers with a 308 to it.
+              */}
+              <Link
+                href="/work"
                 className="text-mono-tag text-zinc-500 hover:text-white transition-colors inline-flex items-center gap-2 mb-8 group font-mono text-xs uppercase tracking-widest"
               >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                /projects
-              </button>
+                /work
+              </Link>
               <div className="text-mono-tag text-neutral-200 mb-4 font-semibold">
                 /{project.slug} — {project.category}
               </div>
               <h1 className="mb-10 max-w-5xl leading-[0.85]">{project.title}</h1>
 
+              {project.intro && (
+                <p className="text-lg text-zinc-400 max-w-3xl mb-12 leading-relaxed">
+                  {project.intro}
+                </p>
+              )}
+
               <div className="grid md:grid-cols-4 gap-px bg-white/5 border border-white/10 mb-16 overflow-hidden rounded-2xl">
-                {[
-                  { label: "Client", value: project.client || "—" },
-                  { label: "Timeframe", value: project.timeframe || "—" },
-                  { label: "Role", value: project.role || "—" },
-                  { label: "Outcome", value: project.metric || "—" },
-                ].map((m) => (
-                  <div key={m.label} className="bg-zinc-950 p-6">
+                {heroMeta.map((m, i) => (
+                  <div key={`${m.label}-${i}`} className="bg-zinc-950 p-6">
                     <div className="text-mono-tag text-zinc-500 mb-2">{m.label}</div>
                     <div className="text-sm font-medium">{m.value}</div>
                   </div>
@@ -204,24 +335,22 @@ export default function ProjectDetailsPage() {
             <div className="max-w-7xl mx-auto">
               <ScrollReveal direction="up">
                 <div className="text-center mb-16">
-                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_stack</div>
-                  <h2 className="mb-6">Engineered for accuracy.</h2>
-                  {project.stackSectionDescription && (
-                    <p className="text-zinc-500 max-w-2xl mx-auto">{project.stackSectionDescription}</p>
+                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">{stackCopy.eyebrow}</div>
+                  <h2 className="mb-6">{stackCopy.title}</h2>
+                  {(project.stackSectionDescription || stackCopy.lead) && (
+                    <p className="text-zinc-500 max-w-2xl mx-auto">
+                      {project.stackSectionDescription || stackCopy.lead}
+                    </p>
                   )}
                 </div>
               </ScrollReveal>
 
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className={`grid grid-cols-2 gap-4 ${stackColumns}`}>
                 {displayTechStacks.map((tech, i) => (
                   <ScrollReveal key={tech._id} delay={i * 0.05} direction="up">
                     <div className="group p-6 bg-zinc-900/30 border border-white/5 rounded-3xl hover:border-white/30 transition-all duration-500 h-full flex flex-col items-center text-center">
                       <div className="w-14 h-14 rounded-2xl bg-zinc-950 border border-white/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
-                        {tech.image ? (
-                          <img src={resolveImageUrl(tech.image)} alt={tech.name} className="w-8 h-8 object-contain" />
-                        ) : (
-                          <Code2 className="w-7 h-7 text-neutral-200" />
-                        )}
+                        <TechGlyph tech={tech} />
                       </div>
                       <div className="font-bold text-base mb-1">{tech.name}</div>
                       {tech.description && (
@@ -243,10 +372,12 @@ export default function ProjectDetailsPage() {
             <div className="max-w-7xl mx-auto">
               <ScrollReveal direction="up">
                 <div className="text-center mb-16">
-                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_roi</div>
-                  <h2 className="mb-6">Tangible impact.</h2>
-                  {project.roiSectionDescription && (
-                    <p className="text-zinc-500 max-w-2xl mx-auto">{project.roiSectionDescription}</p>
+                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">{roiCopy.eyebrow}</div>
+                  <h2 className="mb-6">{roiCopy.title}</h2>
+                  {(project.roiSectionDescription || roiCopy.lead) && (
+                    <p className="text-zinc-500 max-w-2xl mx-auto">
+                      {project.roiSectionDescription || roiCopy.lead}
+                    </p>
                   )}
                 </div>
               </ScrollReveal>
@@ -288,8 +419,8 @@ export default function ProjectDetailsPage() {
                 {project.problem && (
                   <ScrollReveal direction="left">
                     <div>
-                      <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_problem</div>
-                      <h2 className="mb-6 lowercase">The challenge.</h2>
+                      <div className="text-mono-tag text-neutral-200 mb-4 font-bold">{problemCopy.eyebrow}</div>
+                      <h2 className="mb-6 lowercase">{problemCopy.title}</h2>
                       <p className="text-zinc-400 max-w-xl">{project.problem}</p>
                     </div>
                   </ScrollReveal>
@@ -297,8 +428,8 @@ export default function ProjectDetailsPage() {
                 {project.solution && (
                   <ScrollReveal direction="left" delay={0.2}>
                     <div>
-                      <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_solution</div>
-                      <h2 className="mb-6 lowercase">Our approach.</h2>
+                      <div className="text-mono-tag text-neutral-200 mb-4 font-bold">{solutionCopy.eyebrow}</div>
+                      <h2 className="mb-6 lowercase">{solutionCopy.title}</h2>
                       <p className="text-zinc-400 max-w-xl">{project.solution}</p>
                     </div>
                   </ScrollReveal>
@@ -316,7 +447,9 @@ export default function ProjectDetailsPage() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                       <div className="absolute bottom-10 left-10">
-                        <div className="text-mono-tag text-zinc-500 mb-2">0{i + 1} — Process</div>
+                        <div className="text-mono-tag text-zinc-500 mb-2">
+                          0{i + 1} — {item.label?.trim() || "Process"}
+                        </div>
                         <h3 className="font-bold">{item.caption}</h3>
                       </div>
                     </div>
@@ -333,8 +466,11 @@ export default function ProjectDetailsPage() {
             <div className="max-w-7xl mx-auto">
               <ScrollReveal direction="up">
                 <div className="text-center mb-16">
-                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/interface</div>
-                  <h2 className="mb-6">Product in action.</h2>
+                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">{screensCopy.eyebrow}</div>
+                  <h2 className="mb-6">{screensCopy.title}</h2>
+                  {screensCopy.lead && (
+                    <p className="text-zinc-500 max-w-xl mx-auto">{screensCopy.lead}</p>
+                  )}
                 </div>
               </ScrollReveal>
 
@@ -361,7 +497,7 @@ export default function ProjectDetailsPage() {
                       <div className={`absolute inset-0 bg-gradient-to-t via-black/20 transition-all duration-700 ${isActive ? "from-black/90 opacity-100" : "from-black/60 opacity-0"}`} />
 
                       <div className={`relative z-10 p-10 transition-all duration-700 transform-gpu ${isActive ? "translate-y-0 opacity-100 delay-300" : "translate-y-20 opacity-0"}`}>
-                        <div className="text-mono-tag text-neutral-200 mb-4">Screen 0{index + 1}</div>
+                        <div className="text-mono-tag text-neutral-200 mb-4">{screenPrefix} 0{index + 1}</div>
                         <h3 className="text-3xl md:text-4xl font-bold mb-4 tracking-tighter">{screen.label}</h3>
                         {screen.description && (
                           <p className="text-zinc-400 text-base max-w-md mb-6">{screen.description}</p>
@@ -392,23 +528,27 @@ export default function ProjectDetailsPage() {
             <div className="max-w-5xl mx-auto">
               <ScrollReveal direction="up">
                 <div className="text-center mb-16">
-                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/intelligence</div>
-                  <h2 className="mb-4">Intelligence layers.</h2>
-                  <p className="text-zinc-400 max-w-xl mx-auto">
-                    Behind the simple interface lies a complex network of systems working in concert.
-                  </p>
+                  <div className="text-mono-tag text-neutral-200 mb-4 font-bold">{featuresCopy.eyebrow}</div>
+                  <h2 className="mb-4">{featuresCopy.title}</h2>
+                  {featuresCopy.lead && (
+                    <p className="text-zinc-400 max-w-xl mx-auto">{featuresCopy.lead}</p>
+                  )}
                 </div>
               </ScrollReveal>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {project.features.map((f, i) => (
-                  <ScrollReveal key={i} delay={i * 0.1} direction="up">
-                    <div className="p-8 rounded-3xl border border-white/5 bg-zinc-900/30 hover:border-white/20 transition-all duration-500">
-                      <Zap className="w-8 h-8 text-neutral-200 mb-6" />
-                      <h3 className="text-xl font-bold mb-3">{f.title}</h3>
-                      <p className="text-zinc-500 text-sm leading-relaxed">{f.description}</p>
-                    </div>
-                  </ScrollReveal>
-                ))}
+                {project.features.map((f, i) => {
+                  const FeatureIcon = (f.icon && ICON_MAP[f.icon]) || Zap;
+                  const accent = (f.accent && ACCENT_MAP[f.accent]) || DEFAULT_ACCENT;
+                  return (
+                    <ScrollReveal key={i} delay={i * 0.1} direction="up">
+                      <div className="p-8 rounded-3xl border border-white/5 bg-zinc-900/30 hover:border-white/20 transition-all duration-500">
+                        <FeatureIcon className={`w-8 h-8 mb-6 ${accent}`} />
+                        <h3 className="text-xl font-bold mb-3">{f.title}</h3>
+                        <p className="text-zinc-500 text-sm leading-relaxed">{f.description}</p>
+                      </div>
+                    </ScrollReveal>
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -418,8 +558,11 @@ export default function ProjectDetailsPage() {
         {project.workflowSteps.length > 0 && (
           <section className="py-24 px-6 border-b border-white/5 bg-zinc-950/20">
             <div className="max-w-5xl mx-auto text-center mb-16">
-              <div className="text-mono-tag text-neutral-200 mb-4 font-bold">/the_workflow</div>
-              <h2 className="mb-4 lowercase">How we built it.</h2>
+              <div className="text-mono-tag text-neutral-200 mb-4 font-bold">{workflowCopy.eyebrow}</div>
+              <h2 className="mb-4 lowercase">{workflowCopy.title}</h2>
+              {workflowCopy.lead && (
+                <p className="text-zinc-400 max-w-xl mx-auto">{workflowCopy.lead}</p>
+              )}
             </div>
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
               {project.workflowSteps.map((item, i) => (
@@ -499,7 +642,7 @@ export default function ProjectDetailsPage() {
         )}
 
         <ContactCTA />
-        <Footer />
+        <Footer initialSettings={initialSettings} />
       </main>
     </SmoothScroll>
   );

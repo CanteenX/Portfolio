@@ -1,5 +1,5 @@
 import { buildPageMetadata } from "@/lib/seo";
-import { getPublicCategories, getPublicProjects } from "@/lib/api";
+import { getPublicCategories, getPublicProjects, getPublicSettings } from "@/lib/api";
 import WorkView from "./view";
 
 const TITLE = "Work";
@@ -23,9 +23,16 @@ export function generateMetadata() {
 export const revalidate = 3600;
 
 export default async function Page() {
-  const [projects, categories] = await Promise.all([
+  const [projects, categories, settings] = await Promise.all([
     getPublicProjects().catch(() => null),
     getPublicCategories().catch(() => null),
+    getPublicSettings().catch(() => null),
   ]);
-  return <WorkView initialProjects={projects} initialCategories={categories} />;
+  return (
+    <WorkView
+      initialProjects={projects}
+      initialCategories={categories}
+      initialSettings={settings}
+    />
+  );
 }

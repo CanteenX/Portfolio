@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactElement } from "react";
 import { useParams } from "next/navigation";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 import { getMember, splitName, personnelRef, TEAM } from "@/lib/team";
-import { getPublicMemberBySlug, getPublicTeam } from "@/lib/api";
+import { getPublicMemberBySlug, getPublicTeam, type PortfolioSettings} from "@/lib/api";
 import type { ApiMember } from "@/lib/api";
 import type { Member } from "@/lib/team";
 import Link from "next/link";
@@ -15,13 +15,20 @@ import {
   Globe,
   MapPin,
   Languages,
+  Award,
   ExternalLink
 } from "lucide-react";
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
 
-export default function MemberPage() {
+export default function MemberPage({
+  initialSettings = null
+}: {
+  // Seeded from the server shell so the nav and footer carry CMS copy in the
+  // server HTML instead of flashing the shipped fallback after hydration.
+  initialSettings?: PortfolioSettings | null;
+}) {
   const { slug } = useParams();
   const [member, setMember] = useState<Member | ApiMember | null | undefined>(undefined);
   const [allMembers, setAllMembers] = useState<(Member | ApiMember)[]>(TEAM);
@@ -53,7 +60,7 @@ export default function MemberPage() {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
         <h1 className="text-4xl font-bold mb-4">Member Not Found</h1>
-        <a href="/team" className="text-mint hover:underline">Back to Team</a>
+        <Link href="/team" className="text-mint hover:underline">Back to Team</Link>
       </div>
     );
   }
@@ -62,9 +69,30 @@ export default function MemberPage() {
   const idx = allMembers.findIndex((m) => m.slug === member.slug);
   const nextMember = allMembers[(idx + 1) % allMembers.length];
 
+  const hasPersonal = Boolean(
+    member.personal.location || member.personal.email || member.personal.languages.length
+  );
+
+  // A member published from the CMS may have filled in none of these, and a
+  // chip pointing at "#" reads as a broken link rather than a missing one.
+  const contactLinks = [
+    member.personal.email
+      ? { icon: <Mail className="h-4 w-4" />, label: "Email", href: `mailto:${member.personal.email}` }
+      : null,
+    member.socials?.github
+      ? { icon: <FaGithub className="h-4 w-4" />, label: "GitHub", href: member.socials.github }
+      : null,
+    member.socials?.linkedin
+      ? { icon: <FaLinkedin className="h-4 w-4" />, label: "LinkedIn", href: member.socials.linkedin }
+      : null,
+    member.socials?.portfolio
+      ? { icon: <Globe className="h-4 w-4" />, label: "Portfolio", href: member.socials.portfolio }
+      : null
+  ].filter((link): link is { icon: ReactElement; label: string; href: string } => link !== null);
+
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden selection:bg-mint/30">
-      <Navbar />
+      <Navbar initialSettings={initialSettings} />
 
       {/* Ambient glow */}
       <div
@@ -118,16 +146,20 @@ export default function MemberPage() {
               </ScrollReveal>
 
               {/* Personal */}
+              {hasPersonal && (
               <ScrollReveal direction="left" delay={0.1}>
                 <section>
                   <div className="text-mono-tag text-mint mb-4">/personal_details</div>
                   <ul className="space-y-4 text-sm">
+                    {member.personal.location && (
                     <li className="flex items-start gap-4">
                       <div className="p-2 rounded-lg bg-white/5 border border-white/10">
                         <MapPin className="h-4 w-4 text-mint" />
                       </div>
                       <span className="text-gray-300 self-center">{member.personal.location}</span>
                     </li>
+                    )}
+                    {member.personal.email && (
                     <li className="flex items-start gap-4">
                       <div className="p-2 rounded-lg bg-white/5 border border-white/10">
                         <Mail className="h-4 w-4 text-mint" />
@@ -136,17 +168,22 @@ export default function MemberPage() {
                         {member.personal.email}
                       </a>
                     </li>
+                    )}
+                    {member.personal.languages.length > 0 && (
                     <li className="flex items-start gap-4">
                       <div className="p-2 rounded-lg bg-white/5 border border-white/10">
                         <Languages className="h-4 w-4 text-mint" />
                       </div>
                       <span className="text-gray-400 self-center">{member.personal.languages.join(" · ")}</span>
                     </li>
+                    )}
                   </ul>
                 </section>
               </ScrollReveal>
+              )}
 
               {/* Skill matrix */}
+              {member.skills.length > 0 && (
               <ScrollReveal direction="left" delay={0.2}>
                 <section>
                   <div className="text-mono-tag text-mint mb-4">/skill_matrix</div>
@@ -168,6 +205,44 @@ export default function MemberPage() {
                   </ul>
                 </section>
               </ScrollReveal>
+              )}
+
+              {/* Education */}
+              {member.education.length > 0 && (
+              <ScrollReveal direction="left" delay={0.3}>
+                <section>
+                  <div className="text-mono-tag text-mint mb-4">/education</div>
+                  <ul className="space-y-5 text-sm">
+                    {member.education.map((entry, i) => (
+                      <li key={i}>
+                        <div className="font-mono text-[11px] uppercase tracking-widest text-gray-500 mb-1">
+                          {entry.year}
+                        </div>
+                        <div className="text-gray-200">{entry.degree}</div>
+                        <div className="text-gray-500">{entry.school}</div>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              </ScrollReveal>
+              )}
+
+              {/* Certificates */}
+              {member.certificates.length > 0 && (
+              <ScrollReveal direction="left" delay={0.4}>
+                <section>
+                  <div className="text-mono-tag text-mint mb-4">/certificates</div>
+                  <ul className="space-y-3 text-sm">
+                    {member.certificates.map((certificate, i) => (
+                      <li key={i} className="flex items-start gap-3 text-gray-300">
+                        <Award className="h-4 w-4 text-mint shrink-0 mt-0.5" />
+                        <span>{certificate.title}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              </ScrollReveal>
+              )}
             </aside>
 
             {/* RIGHT: 8/12 */}
@@ -184,11 +259,7 @@ export default function MemberPage() {
                   </h1>
 
                   <div className="mt-10 flex flex-wrap gap-4">
-                    {[
-                      { icon: <Mail className="h-4 w-4" />, label: "Email", href: `mailto:${member.personal.email}` },
-                      { icon: <FaGithub className="h-4 w-4" />, label: "GitHub", href: member.socials?.github ?? "#" },
-                      { icon: <Globe className="h-4 w-4" />, label: "Portfolio", href: member.socials?.portfolio ?? "#" },
-                    ].map((link) => (
+                    {contactLinks.map((link) => (
                       <a
                         key={link.label}
                         href={link.href}
@@ -202,6 +273,7 @@ export default function MemberPage() {
               </header>
 
               {/* Bio */}
+              {member.bio && (
               <ScrollReveal direction="right">
                 <section>
                   <div className="text-mono-tag text-mint mb-6">/bio</div>
@@ -210,8 +282,10 @@ export default function MemberPage() {
                   </p>
                 </section>
               </ScrollReveal>
+              )}
 
               {/* Experience */}
+              {member.experience.length > 0 && (
               <ScrollReveal direction="up">
                 <section>
                   <div className="text-mono-tag text-mint mb-8">/experience_ledger</div>
@@ -237,13 +311,15 @@ export default function MemberPage() {
                   </ol>
                 </section>
               </ScrollReveal>
+              )}
 
               {/* Projects */}
+              {member.projects.length > 0 && (
               <section>
                 <ScrollReveal direction="up">
                   <div className="text-mono-tag text-mint mb-8">/projects_grid</div>
                   <div className="grid sm:grid-cols-2 gap-4">
-                    {member.projects.map((p, index) => (
+                    {member.projects.map((p) => (
                       <article
                         key={p.title}
                         className="group bg-zinc-900/50 backdrop-blur-sm border border-white/5 p-8 hover:border-white/20 transition-all duration-500 rounded-3xl"
@@ -267,6 +343,7 @@ export default function MemberPage() {
                   </div>
                 </ScrollReveal>
               </section>
+              )}
 
               {/* Next dossier */}
               {nextMember && (
@@ -291,7 +368,7 @@ export default function MemberPage() {
       </main>
 
       <ContactCTA />
-      <Footer />
+      <Footer initialSettings={initialSettings} />
     </div>
   );
 }

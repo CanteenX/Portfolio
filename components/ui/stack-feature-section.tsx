@@ -26,7 +26,8 @@ const iconConfigs = [
   { Icon: SiPostgresql, color: "#4169E1", name: "PostgreSQL" },
 ];
 
-const techBadges = [
+/** Shipped floor for `settings.techMarquee`, applied when the CMS list is empty. */
+const FALLBACK_TECH_BADGES = [
   "React", "Next.js", "TypeScript", "Node.js", "Python",
   "Tailwind CSS", "MongoDB", "PostgreSQL", "Docker", "AWS",
   "GraphQL", "Firebase",
@@ -43,10 +44,16 @@ const ORBIT_STYLES = `
   }
 `;
 
-export default function FeatureSection() {
+export default function FeatureSection({ techMarquee }: { techMarquee?: string[] | null }) {
   const orbitCount = 3;
   const orbitGap = 8;
   const iconsPerOrbit = Math.ceil(iconConfigs.length / orbitCount);
+
+  // `settings.techMarquee` had an admin input and a database column and no
+  // reader. Entries are trimmed and blanks dropped so one stray empty row in
+  // the editor cannot render an empty pill.
+  const fromCms = (techMarquee ?? []).map((name) => name?.trim()).filter(Boolean) as string[];
+  const techBadges = fromCms.length > 0 ? fromCms : FALLBACK_TECH_BADGES;
 
   return (
     <section className="relative max-w-6xl mx-auto my-16 md:my-24 px-6 md:px-0 md:pl-10 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-0 py-12 md:py-0 md:h-[30rem] border border-white/10 bg-zinc-950 overflow-hidden rounded-3xl">

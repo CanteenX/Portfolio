@@ -28,8 +28,8 @@ export function usePublicAPI<T>(
 
   useEffect(() => {
     let cancelled = false;
-    // Already have server data — do not flash a loading state over it.
-    if (!seeded) setLoading(true);
+    // `loading` is already initialised from `seeded`, so there is nothing to
+    // set here: server-seeded data never flashes a spinner over itself.
     fetchFn()
       .then((result) => {
         if (!cancelled) {

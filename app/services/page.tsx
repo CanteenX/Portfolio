@@ -1,5 +1,5 @@
 import { buildPageMetadata } from "@/lib/seo";
-import { getPublicSettings } from "@/lib/api";
+import { getPublicServices, getPublicSettings } from "@/lib/api";
 import ServicesView from "./view";
 
 const TITLE = "Services";
@@ -27,6 +27,9 @@ export const revalidate = 3600;
 
 export default async function Page() {
   // Failure here must not 500 the page — the view still has its own fallback.
-  const settings = await getPublicSettings().catch(() => null);
-  return <ServicesView initialSettings={settings} />;
+  const [services, settings] = await Promise.all([
+    getPublicServices().catch(() => []),
+    getPublicSettings().catch(() => null)
+  ]);
+  return <ServicesView initialServices={services} initialSettings={settings} />;
 }

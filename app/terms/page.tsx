@@ -1,5 +1,7 @@
 import { buildPageMetadata } from "@/lib/seo";
 import { LegalPage } from "@/components/ui/legal-page";
+import { LegalDocument } from "@/components/ui/legal-document";
+import { getPublicLegalDocument, getPublicSettings} from "@/lib/api";
 import { LEGAL } from "@/lib/legal";
 
 const TITLE = "Terms of Use";
@@ -19,9 +21,18 @@ export function generateMetadata() {
   });
 }
 
-export default function Page() {
+/** See app/privacy/page.tsx — same override-with-fallback contract. */
+export const revalidate = 3600;
+
+export default async function Page() {
+  const [published, settings] = await Promise.all([
+    getPublicLegalDocument("terms"),
+    getPublicSettings().catch(() => null)
+  ]);
+  if (published) return <LegalDocument document={published} initialSettings={settings} />;
+
   return (
-    <LegalPage title={TITLE} lastUpdated={LEGAL.lastUpdated}>
+    <LegalPage title={TITLE} lastUpdated={LEGAL.lastUpdated} initialSettings={settings}>
       <section>
         <h2>These terms cover this website only</h2>
         <p>

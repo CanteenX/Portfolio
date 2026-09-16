@@ -11,6 +11,8 @@ import { ContactCTA } from "@/components/ui/contact-cta";
 import { Footer } from "@/components/ui/footer";
 import { usePublicSettings } from "@/lib/usePublicAPI";
 import { getPublicSettings, type PortfolioSettings } from "@/lib/api";
+import { resolvePageCopy } from "@/lib/page-copy";
+import { EmphasisedHeadline } from "@/components/ui/emphasised-headline";
 
 const ICON_MAP: Record<string, ElementType> = {
   Zap, Shield, Users, Globe, Target, ArrowRight, Eye,
@@ -43,24 +45,32 @@ export default function AboutView({ initialSettings }: { initialSettings: Portfo
   const mission = settings?.about?.mission || FALLBACK_MISSION;
   const values = settings?.about?.values?.length ? settings.about.values : FALLBACK_VALUES;
   const stats = settings?.about?.stats?.length ? settings.about.stats : FALLBACK_STATS;
+  const copy = resolvePageCopy(settings, "about", {
+    eyebrow: "/story — Founders",
+    title: "Engineering the next digital frontier.",
+    lead:
+      "We are an elite collective of visionaries, engineers, and designers dedicated to pushing the boundaries of what's possible in the digital realm."
+  });
 
   return (
     <SmoothScroll>
       <main className="min-h-screen w-full bg-black text-white selection:bg-mint/30">
-        <Navbar />
+        <Navbar initialSettings={initialSettings} />
 
         {/* Hero Section */}
         <section className="relative pt-36 pb-20 px-6 overflow-hidden">
           <div className="max-w-7xl mx-auto relative z-10">
             <ScrollReveal direction="up" duration={1}>
               <div className="mb-20">
-                <div className="text-mono-tag text-mint mb-4">/story — Founders</div>
+                <div className="text-mono-tag text-mint mb-4">{copy.eyebrow}</div>
                 <h1 className="mb-8 leading-[0.85] lowercase">
-                  Engineering the <span className="text-zinc-600 italic">next</span> digital frontier.
+                  <EmphasisedHeadline text={copy.title} word="next" />
                 </h1>
-                <p className="text-xl text-zinc-400 max-w-3xl font-light leading-relaxed">
-                  We are an elite collective of visionaries, engineers, and designers dedicated to pushing the boundaries of what's possible in the digital realm.
-                </p>
+                {copy.lead && (
+                  <p className="text-xl text-zinc-400 max-w-3xl font-light leading-relaxed">
+                    {copy.lead}
+                  </p>
+                )}
               </div>
             </ScrollReveal>
 
@@ -142,7 +152,7 @@ export default function AboutView({ initialSettings }: { initialSettings: Portfo
                 <div className="text-mono-tag text-mint mb-4">/reach — Statistics</div>
                 <h2 className="mb-8 tracking-tight">Our global impact.</h2>
                 <p className="text-zinc-400 text-lg mb-12 max-w-xl leading-relaxed font-light">
-                  We've built solutions for visionary companies across 4 continents. Our code powers businesses from Silicon Valley to Singapore.
+                  We&rsquo;ve built solutions for visionary companies across 4 continents. Our code powers businesses from Silicon Valley to Singapore.
                 </p>
 
                 <div className="grid grid-cols-2 gap-10">
@@ -162,8 +172,8 @@ export default function AboutView({ initialSettings }: { initialSettings: Portfo
           </div>
         </section>
 
-        <ContactCTA />
-        <Footer />
+        <ContactCTA initialSettings={initialSettings} />
+        <Footer initialSettings={initialSettings} />
       </main>
     </SmoothScroll>
   );

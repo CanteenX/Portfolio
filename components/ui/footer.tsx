@@ -2,8 +2,12 @@
 
 import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
-import { usePublicSettings } from "@/lib/usePublicAPI";
-import { getPublicSettings } from "@/lib/api";
+import { usePublicAPI, usePublicSettings } from "@/lib/usePublicAPI";
+import {
+  getPublicLegalDocuments,
+  getPublicSettings,
+  type PortfolioSettings
+} from "@/lib/api";
 
 const FALLBACK = {
   brandName: "NVENTRA",
@@ -14,19 +18,46 @@ const FALLBACK = {
     { label: "Work", href: "/work" },
     { label: "Services", href: "/services" },
     { label: "Team", href: "/team" },
-    { label: "Projects", href: "/projects" },
+    { label: "FAQ", href: "/faq" },
     { label: "Contact", href: "/contact" },
   ],
 };
 
-export function Footer() {
-  const { settings } = usePublicSettings(getPublicSettings);
+/**
+ * Privacy and Terms always render — they are routes in this repo, published
+ * document or not — and anything else the owner publishes joins them.
+ *
+ * Fetched client-side rather than threaded through every page's server
+ * component: the two required links are in the first paint regardless, so the
+ * one that matters for Google Ads, Meta and procurement is never waiting on a
+ * request. A third document appearing a beat later is not worth a prop on
+ * fifteen call sites.
+ */
+const REQUIRED_LEGAL_LINKS = [
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" }
+];
+
+function useLegalLinks(): { label: string; href: string }[] {
+  const { data } = usePublicAPI(getPublicLegalDocuments, []);
+
+  const extra = data
+    .filter((document) => document.slug !== "privacy" && document.slug !== "terms")
+    .map((document) => ({ label: document.title, href: `/legal/${document.slug}` }));
+
+  return [...REQUIRED_LEGAL_LINKS, ...extra];
+}
+
+/** See Navbar: seeded from the server render so the footer does not flash. */
+export function Footer({ initialSettings }: { initialSettings?: PortfolioSettings | null }) {
+  const { settings } = usePublicSettings(getPublicSettings, initialSettings);
 
   const brandName = settings?.navbar?.brandName || FALLBACK.brandName;
   const description = settings?.footer?.description || FALLBACK.description;
   const email = settings?.footer?.email || FALLBACK.email;
   const version = settings?.footer?.version || FALLBACK.version;
   const links = settings?.footer?.links?.length ? settings.footer.links : FALLBACK.links;
+  const legalLinks = useLegalLinks();
 
   return (
     <footer className="border-t hairline mt-16 bg-black">
@@ -75,12 +106,11 @@ export function Footer() {
             privacy policy on the landing domain.
           */}
           <span className="flex items-center gap-4">
-            <Link href="/privacy" className="hover:text-mint transition-colors">
-              Privacy
-            </Link>
-            <Link href="/terms" className="hover:text-mint transition-colors">
-              Terms
-            </Link>
+            {legalLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="hover:text-mint transition-colors">
+                {link.label}
+              </Link>
+            ))}
           </span>
           <span className="flex items-center gap-2">
             <span className="size-1.5 bg-mint animate-pulse" />

@@ -5,10 +5,19 @@ import { Footer } from "@/components/ui/footer";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { ContactCTA } from "@/components/ui/contact-cta";
-import Link from "next/link";
+import { getPublicSettings, type ApiService, type PortfolioSettings } from "@/lib/api";
 import { usePublicSettings } from "@/lib/usePublicAPI";
-import { getPublicSettings, type PortfolioSettings } from "@/lib/api";
+import { resolvePageCopy } from "@/lib/page-copy";
+import { EmphasisedHeadline } from "@/components/ui/emphasised-headline";
 
+/**
+ * Shipped copy, used only when the API returns nothing at all.
+ *
+ * Per-record, not per-field: a service that exists in the CMS renders entirely
+ * from the CMS. The old code did the opposite — it took names from the CMS and
+ * looked their descriptions up here by exact title match, so renaming "CRM
+ * Panel" in the admin panel blanked its description on the live page.
+ */
 const FALLBACK_SERVICES = [
   {
     id: "01",
@@ -68,38 +77,52 @@ const FALLBACK_SERVICES = [
   },
 ];
 
-export default function ServicesView({ initialSettings }: { initialSettings: PortfolioSettings | null }) {
+export default function ServicesView({
+  initialServices,
+  initialSettings = null,
+}: {
+  initialServices: ApiService[];
+  initialSettings?: PortfolioSettings | null;
+}) {
   const { settings } = usePublicSettings(getPublicSettings, initialSettings);
+  const copy = resolvePageCopy(settings, "services", {
+    eyebrow: "Our_Services //",
+    title: "What we build.",
+    lead:
+      "From zero to production. We cover the full stack — design, engineering, cloud, and growth — so you don't have to stitch together multiple agencies."
+  });
 
-  const services =
-    settings?.services?.length
-      ? settings.services.map((s: string, i: number) => ({
-          id: String(i + 1).padStart(2, "0"),
-          title: s,
-          description: FALLBACK_SERVICES.find((f) => f.title === s)?.description ?? "",
-          tags: FALLBACK_SERVICES.find((f) => f.title === s)?.tags ?? [],
-        }))
-      : FALLBACK_SERVICES;
+  const services = initialServices.length
+    ? initialServices.map((service, i) => ({
+        id: String(i + 1).padStart(2, "0"),
+        title: service.title,
+        description: service.description,
+        tags: service.tags ?? [],
+      }))
+    : FALLBACK_SERVICES;
 
   return (
     <SmoothScroll>
       <main className="min-h-screen w-full overflow-x-hidden bg-black text-white selection:bg-mint/30">
-        <Navbar />
+        <Navbar initialSettings={initialSettings} />
 
         {/* Hero */}
         <section className="pt-40 pb-20 px-6">
           <div className="max-w-7xl mx-auto">
             <ScrollReveal direction="up">
-              <div className="text-mono-tag text-mint mb-4">Our_Services //</div>
+              <div className="text-mono-tag text-mint mb-4">{copy.eyebrow}</div>
               <h1 className="mb-6">
-                What we{" "}
-                <span className="text-white italic">build.</span>
+                <EmphasisedHeadline
+                  text={copy.title}
+                  word="build."
+                  className="text-white italic"
+                />
               </h1>
-              <p className="text-zinc-400 max-w-2xl text-lg md:text-xl leading-relaxed font-light">
-                From zero to production. We cover the full stack — design,
-                engineering, cloud, and growth — so you don't have to stitch
-                together multiple agencies.
-              </p>
+              {copy.lead && (
+                <p className="text-zinc-400 max-w-2xl text-lg md:text-xl leading-relaxed font-light">
+                  {copy.lead}
+                </p>
+              )}
             </ScrollReveal>
           </div>
         </section>
@@ -150,8 +173,8 @@ export default function ServicesView({ initialSettings }: { initialSettings: Por
 
 
 
-        <ContactCTA />
-        <Footer />
+        <ContactCTA initialSettings={initialSettings} />
+        <Footer initialSettings={initialSettings} />
       </main>
     </SmoothScroll>
   );

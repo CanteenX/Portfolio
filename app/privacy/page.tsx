@@ -1,5 +1,7 @@
 import { buildPageMetadata } from "@/lib/seo";
 import { LegalPage } from "@/components/ui/legal-page";
+import { LegalDocument } from "@/components/ui/legal-document";
+import { getPublicLegalDocument, getPublicSettings} from "@/lib/api";
 import { LEGAL } from "@/lib/legal";
 
 const TITLE = "Privacy Policy";
@@ -19,9 +21,30 @@ export function generateMetadata() {
   });
 }
 
-export default function Page() {
+/**
+ * Re-fetched hourly so a policy published from the CMS goes live without a
+ * deploy. Saving the document also triggers an immediate revalidation of this
+ * path, so the hour is the ceiling, not the wait.
+ */
+export const revalidate = 3600;
+
+/**
+ * The published document from the CMS when there is one, and the copy bundled
+ * in this repo otherwise.
+ *
+ * The fallback is not a nicety. A legal page that renders empty because an API
+ * call failed is worse than a slightly out-of-date one, and this is the only
+ * page type where that trade is not close.
+ */
+export default async function Page() {
+  const [published, settings] = await Promise.all([
+    getPublicLegalDocument("privacy"),
+    getPublicSettings().catch(() => null)
+  ]);
+  if (published) return <LegalDocument document={published} initialSettings={settings} />;
+
   return (
-    <LegalPage title={TITLE} lastUpdated={LEGAL.lastUpdated}>
+    <LegalPage title={TITLE} lastUpdated={LEGAL.lastUpdated} initialSettings={settings}>
       <section>
         <h2>Who we are</h2>
         <p>

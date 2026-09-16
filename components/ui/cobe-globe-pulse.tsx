@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback } from "react"
 import createGlobe from "cobe"
+import { useReducedMotion } from "@/lib/useReducedMotion"
 
 interface PulseMarker {
   id: string
@@ -33,6 +34,8 @@ export function GlobePulse({
   const phiOffsetRef = useRef(0)
   const thetaOffsetRef = useRef(0)
   const isPausedRef = useRef(false)
+  const reducedMotion = useReducedMotion()
+  const rotationSpeed = reducedMotion ? 0 : speed
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     pointerInteracting.current = { x: e.clientX, y: e.clientY }
@@ -106,7 +109,10 @@ export function GlobePulse({
       })
 
       function animate() {
-        if (!isPausedRef.current) phi += speed
+        // Reduced motion stops the idle spin but keeps the globe, and dragging
+        // still works — the motion a visitor causes themselves is not the
+        // problem, the perpetual one they did not ask for is.
+        if (!isPausedRef.current) phi += rotationSpeed
         globe!.update({
           phi: phi + phiOffsetRef.current + dragOffset.current.phi,
           theta: 0.2 + thetaOffsetRef.current + dragOffset.current.theta,
@@ -133,7 +139,7 @@ export function GlobePulse({
       if (animationId) cancelAnimationFrame(animationId)
       if (globe) globe.destroy()
     }
-  }, [markers, speed])
+  }, [markers, rotationSpeed])
 
   return (
     <div className={`relative aspect-square select-none ${className}`}>
@@ -161,7 +167,6 @@ export function GlobePulse({
           key={m.id}
           style={{
             position: "absolute",
-            // @ts-ignore CSS Anchor Positioning
             positionAnchor: `--cobe-${m.id}`,
             bottom: "anchor(center)",
             left: "anchor(center)",

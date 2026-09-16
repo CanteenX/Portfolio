@@ -1,5 +1,5 @@
 import { buildPageMetadata } from "@/lib/seo";
-import { getPublicSettings } from "@/lib/api";
+import { getPublicServices, getPublicSettings } from "@/lib/api";
 import ContactView from "./view";
 
 const TITLE = "Contact";
@@ -27,6 +27,9 @@ export const revalidate = 3600;
 
 export default async function Page() {
   // Failure here must not 500 the page — the view still has its own fallback.
-  const settings = await getPublicSettings().catch(() => null);
-  return <ContactView initialSettings={settings} />;
+  const [settings, services] = await Promise.all([
+    getPublicSettings().catch(() => null),
+    getPublicServices().catch(() => [])
+  ]);
+  return <ContactView initialSettings={settings} initialServices={services} />;
 }

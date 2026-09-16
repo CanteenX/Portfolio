@@ -1,5 +1,4 @@
 import axios from "axios";
-import type { Project } from "./projects";
 import type { Member } from "./team";
 
 // In production the website is served from the same origin as /api (via Next.js
@@ -36,6 +35,11 @@ export function resolveApiBaseUrl(): string {
 export function resolveImageUrl(path: string | undefined | null): string {
   if (!path) return "";
   if (path.startsWith("http")) return path;
+  // Anything outside /uploads is a file this site ships in `public/` — the
+  // migrated case studies reference `/projects/<slug>/hero.jpg` — so it is
+  // already a correct URL. Prefixing the API origin would send the browser
+  // looking for it on the backend, which does not have it.
+  if (!path.startsWith("/uploads")) return path;
   // Deliberately the browser base, not the server one: this string ends up in
   // an <img src> that the visitor resolves, so it must stay same-origin.
   return `${API_URL}${path}`;
@@ -49,6 +53,19 @@ export type RoiItem = { value: string; label: string; description: string; icon:
 export type Screen = { label: string; caption: string; description: string; image: string };
 export type WorkflowStep = { step: string; title: string; description: string };
 
+/** Per-project section copy. Empty fields fall back to the renderer's defaults. */
+export type SectionHeading = { eyebrow?: string; title?: string; lead?: string };
+
+export type SectionHeadings = {
+  stack?: SectionHeading;
+  roi?: SectionHeading;
+  problem?: SectionHeading;
+  solution?: SectionHeading;
+  screens?: SectionHeading;
+  features?: SectionHeading;
+  workflow?: SectionHeading;
+};
+
 export type ApiProject = {
   _id: string;
   slug: string;
@@ -60,14 +77,18 @@ export type ApiProject = {
   client: string;
   timeframe: string;
   role: string;
+  intro?: string;
+  heroMeta?: { label: string; value: string }[];
+  sectionHeadings?: SectionHeadings;
+  screenLabelPrefix?: string;
   stack: string[];
   techStack: string[];
   liveUrl?: string;
   githubUrl?: string;
   problem: string;
   solution: string;
-  features: { title: string; description: string }[];
-  gallery: { src: string; caption: string }[];
+  features: { title: string; description: string; icon?: string; accent?: string }[];
+  gallery: { src: string; caption: string; label?: string }[];
   roi: RoiItem[];
   roiSectionDescription: string;
   screens: Screen[];
@@ -79,7 +100,16 @@ export type ApiProject = {
   order: number;
 };
 
-export type ApiTechStack = { _id: string; name: string; image: string; description: string; isActive: boolean; order: number };
+export type ApiTechStack = {
+  _id: string;
+  name: string;
+  image: string;
+  description: string;
+  icon?: string;
+  color?: string;
+  isActive: boolean;
+  order: number;
+};
 
 export type ApiMember = Member & { _id: string };
 
@@ -94,7 +124,6 @@ export type PortfolioSettings = {
   navbar: { brandName: string; links: { label: string; href: string }[] };
   footer: { description: string; email: string; version: string; links: { label: string; href: string }[] };
   techMarquee: string[];
-  services: string[];
   callSlots: string[];
   about: {
     vision: string;
@@ -108,6 +137,159 @@ export type PortfolioSettings = {
   };
   teamPlaybook: { phase: string; name: string; body: string }[];
   contactInfo: { email: string; phone: string };
+  /** Per-page headings. Missing or blank fields fall back to shipped copy. */
+  pageCopy?: {
+    work?: PageCopy;
+    services?: PageCopy;
+    team?: PageCopy;
+    about?: PageCopy;
+    process?: PageCopy;
+    contact?: PageCopy;
+    insights?: PageCopy;
+    faq?: PageCopy;
+  };
+  contactCta?: {
+    eyebrow?: string;
+    title?: string;
+    lead?: string;
+    primary?: { label?: string; href?: string };
+    secondary?: { label?: string; href?: string };
+  };
+  contactForm?: { budgetBands?: string[]; timelines?: string[] };
+  engagement?: {
+    eyebrow?: string;
+    title?: string;
+    lead?: string;
+    bands?: { name: string; range: string; duration: string; description: string }[];
+    footnote?: string;
+  };
+};
+
+/** An eyebrow, a heading and a lead paragraph, any of which may be blank. */
+export type PageCopy = { eyebrow?: string; title?: string; lead?: string };
+
+/**
+ * One service, structured.
+ *
+ * `PortfolioSettings.services` was a `string[]`, so the website had to rejoin
+ * each name to a hardcoded description by exact title match — making the title
+ * a lookup key that an editor could break just by renaming it. `slug` is now
+ * the identity and the copy travels with the record.
+ */
+export type ApiService = {
+  _id: string;
+  slug: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  tags: string[];
+  icon: string;
+  pointers: string[];
+  highlights: string[];
+  showInContactForm: boolean;
+  isActive: boolean;
+  order: number;
+};
+
+export type ApiTestimonial = {
+  _id: string;
+  quote: string;
+  authorName: string;
+  authorRole: string;
+  authorCompany: string;
+  avatar: string;
+  rating?: number;
+  isActive: boolean;
+  order: number;
+};
+
+export type ApiClientLogo = {
+  _id: string;
+  name: string;
+  logo: string;
+  websiteUrl: string;
+  isActive: boolean;
+  order: number;
+};
+
+/** `value` is free text — "40+", "99.9%" and "8,000+" are all valid. */
+export type ApiMetric = {
+  _id: string;
+  value: string;
+  label: string;
+  description: string;
+  isActive: boolean;
+  order: number;
+};
+
+/**
+ * A legal document as published from the CMS.
+ *
+ * `sections` are headed blocks, never HTML — the renderer prints text nodes and
+ * splits paragraphs on blank lines, so nothing from this collection reaches
+ * `dangerouslySetInnerHTML`.
+ */
+export type ApiLegalDocument = {
+  _id: string;
+  slug: string;
+  title: string;
+  lastUpdated: string;
+  intro: string;
+  sections: { heading: string; body: string }[];
+  isPublished: boolean;
+  order: number;
+};
+
+/**
+ * One block of a post's body.
+ *
+ * `label` carries the heading text for a `heading` block and the language for a
+ * `code` block; it is unused by the rest. A `list` block's `text` is one item
+ * per line.
+ */
+export type ApiPostBlock = {
+  type: "paragraph" | "heading" | "quote" | "code" | "list";
+  label: string;
+  text: string;
+};
+
+/** What the index and the feed need. The detail route returns this plus `blocks`. */
+export type ApiPostSummary = {
+  _id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  coverImage: string;
+  category: string;
+  tags: string[];
+  authorName: string;
+  authorRole: string;
+  publishedAt: string;
+  readingMinutes: number;
+  isFeatured: boolean;
+  order: number;
+};
+
+export type ApiPost = ApiPostSummary & {
+  blocks: ApiPostBlock[];
+};
+
+/** `category` is free text and groups questions on the page; "" means ungrouped. */
+export type ApiFaq = {
+  _id: string;
+  question: string;
+  answer: string;
+  category: string;
+  isActive: boolean;
+  order: number;
+};
+
+export type ApiLegalSummary = {
+  _id: string;
+  slug: string;
+  title: string;
+  lastUpdated: string;
+  order: number;
 };
 
 export type ContactFormData = {
@@ -210,6 +392,126 @@ export async function getPublicSettings(): Promise<PortfolioSettings | null> {
     return data && Object.keys(data).length > 0 ? data : null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * The service catalogue behind /services, the homepage carousel and the
+ * contact form's dropdown. Returns `[]` rather than throwing so each surface
+ * can fall back to its shipped copy instead of rendering an error.
+ */
+export async function getPublicServices(): Promise<ApiService[]> {
+  try {
+    const { data } = await apiClient.get<{ items: ApiService[] }>("/api/v1/public/portfolio/services");
+    return data.items ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Social proof, all three shapes.
+ *
+ * Each returns `[]` on failure AND ships empty, which the renderers treat
+ * identically: the section is not rendered. There is deliberately no fallback
+ * content — a fabricated testimonial with a person's name on it is a false
+ * claim, not a placeholder, and an empty section is the honest state until real
+ * content is published.
+ */
+export async function getPublicTestimonials(): Promise<ApiTestimonial[]> {
+  try {
+    const { data } = await apiClient.get<{ items: ApiTestimonial[] }>("/api/v1/public/portfolio/testimonials");
+    return data.items ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getPublicClientLogos(): Promise<ApiClientLogo[]> {
+  try {
+    const { data } = await apiClient.get<{ items: ApiClientLogo[] }>("/api/v1/public/portfolio/client-logos");
+    return data.items ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getPublicMetrics(): Promise<ApiMetric[]> {
+  try {
+    const { data } = await apiClient.get<{ items: ApiMetric[] }>("/api/v1/public/portfolio/metrics");
+    return data.items ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/** Published posts, newest first. Empty on failure — the index says so. */
+export async function getPublicPosts(): Promise<ApiPostSummary[]> {
+  try {
+    const { data } = await apiClient.get<{ items: ApiPostSummary[] }>(
+      "/api/v1/public/portfolio/posts"
+    );
+    return data.items ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/** One published post, or `null` — which the detail route turns into a 404. */
+export async function getPublicPostBySlug(slug: string): Promise<ApiPost | null> {
+  try {
+    const { data } = await apiClient.get<ApiPost>(
+      `/api/v1/public/portfolio/posts/${encodeURIComponent(slug)}`
+    );
+    return data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Published questions, ordered.
+ *
+ * Empty on failure and empty when nothing is published — the page treats both
+ * the same way and says so, rather than inventing questions nobody asked.
+ */
+export async function getPublicFaqs(): Promise<ApiFaq[]> {
+  try {
+    const { data } = await apiClient.get<{ items: ApiFaq[] }>("/api/v1/public/portfolio/faqs");
+    return data.items ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * A published legal document, or `null`.
+ *
+ * `null` means "no published override" and is what makes the fallback safe:
+ * the page renders the copy bundled in the repo instead. A legal page is the
+ * one surface on the site that must never render empty because a fetch failed,
+ * so the distinction is kept rather than collapsed into an empty object.
+ */
+export async function getPublicLegalDocument(slug: string): Promise<ApiLegalDocument | null> {
+  try {
+    const { data } = await apiClient.get<ApiLegalDocument>(
+      `/api/v1/public/portfolio/legal/${encodeURIComponent(slug)}`
+    );
+    return data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Published legal documents, for the footer and the sitemap. */
+export async function getPublicLegalDocuments(): Promise<ApiLegalSummary[]> {
+  try {
+    const { data } = await apiClient.get<{ items: ApiLegalSummary[] }>(
+      "/api/v1/public/portfolio/legal"
+    );
+    return data.items ?? [];
+  } catch {
+    return [];
   }
 }
 

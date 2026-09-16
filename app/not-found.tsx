@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
+import { getPublicSettings } from "@/lib/api";
 
 /**
  * A 404 that keeps the visitor on the site.
@@ -23,10 +24,15 @@ const DESTINATIONS = [
   { href: "/contact", label: "Contact", detail: "Start a conversation" }
 ];
 
-export default function NotFound() {
+export default async function NotFound() {
+  // A 404 is often a visitor's first impression from a stale link in an old
+  // proposal deck. The nav they land on should carry the real brand, not the
+  // shipped fallback, so the settings lookup rides along here too.
+  const settings = await getPublicSettings().catch(() => null);
+
   return (
     <main className="min-h-screen bg-black text-white">
-      <Navbar />
+      <Navbar initialSettings={settings} />
       <div className="mx-auto w-full max-w-3xl px-6 py-32">
         <p className="font-mono text-sm uppercase tracking-[0.2em] text-zinc-500">Error 404</p>
         <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl">
@@ -51,7 +57,7 @@ export default function NotFound() {
           ))}
         </div>
       </div>
-      <Footer />
+      <Footer initialSettings={settings} />
     </main>
   );
 }

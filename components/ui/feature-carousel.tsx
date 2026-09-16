@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "motion/react";
+import { useMediaQuery, useReducedMotion } from "@/lib/useReducedMotion";
 import {
   SmartPhone01Icon,
   Globe02Icon,
@@ -11,15 +12,36 @@ import {
   SeoIcon,
   UserIcon,
   PencilEdit02Icon,
+  AiBrain01Icon,
 } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { HugeiconsIcon } from "@hugeicons/react";
+import type { ApiService } from "@/lib/api";
 
-// Services We Offer
-const FEATURES = [
+/**
+ * Icons cannot cross the API boundary as components, so a service stores a key
+ * and this resolves it. An unknown key falls back rather than crashing the
+ * carousel — the icon is decoration, the service is the content.
+ */
+const ICONS: Record<string, typeof SmartPhone01Icon> = {
+  smartphone: SmartPhone01Icon,
+  globe: Globe02Icon,
+  dashboard: DashboardSquare01Icon,
+  settings: Settings02Icon,
+  google: GoogleIcon,
+  seo: SeoIcon,
+  consultancy: UserIcon,
+  pencil: PencilEdit02Icon,
+  ai: AiBrain01Icon,
+};
+
+const DEFAULT_ICON = DashboardSquare01Icon;
+
+// Services We Offer — shipped copy, used only when the catalogue is unreachable.
+const FALLBACK_FEATURES = [
   {
     id: "app-building",
-    label: "App Building",
+    label: "App Development",
     subtitle: "Mobile solutions that scale",
     icon: SmartPhone01Icon,
     description: "Custom mobile applications tailored to your business needs with cutting-edge technology.",
@@ -47,7 +69,7 @@ const FEATURES = [
   },
   {
     id: "crm-panel",
-    label: "CRM Panel",
+    label: "CRM & Admin Panels",
     subtitle: "Customer relationships simplified",
     icon: DashboardSquare01Icon,
     description: "Powerful CRM solutions to manage customer relationships and boost your sales pipeline.",
@@ -75,7 +97,7 @@ const FEATURES = [
   },
   {
     id: "google-meta-ads",
-    label: "Google Meta Ads",
+    label: "Google & Meta Ads",
     subtitle: "Strategic campaigns that deliver",
     icon: GoogleIcon,
     description: "Strategic ad campaigns across Google and Meta platforms for maximum ROI.",
@@ -117,7 +139,7 @@ const FEATURES = [
   },
   {
     id: "designing",
-    label: "Designing",
+    label: "UI/UX Design",
     subtitle: "Beauty meets functionality",
     icon: PencilEdit02Icon,
     description: "Creative design solutions that blend aesthetics with functionality and user experience.",
@@ -140,18 +162,35 @@ const wrap = (min: number, max: number, v: number) => {
   return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min;
 };
 
-export function FeatureCarousel() {
+type Feature = {
+  id: string;
+  label: string;
+  subtitle: string;
+  icon: typeof SmartPhone01Icon;
+  description: string;
+  highlights: string[];
+  pointers: string[];
+};
+
+function toFeature(service: ApiService): Feature {
+  return {
+    id: service.slug,
+    label: service.title,
+    subtitle: service.subtitle,
+    icon: ICONS[service.icon] ?? DEFAULT_ICON,
+    description: service.description,
+    highlights: service.highlights ?? [],
+    pointers: service.pointers ?? [],
+  };
+}
+
+export function FeatureCarousel({ services = [] }: { services?: ApiService[] }) {
+  const FEATURES: Feature[] = services.length ? services.map(toFeature) : FALLBACK_FEATURES;
+
   const [step, setStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [isLg, setIsLg] = useState(false);
-
-  useEffect(() => {
-    const mql = window.matchMedia("(min-width: 1024px)");
-    setIsLg(mql.matches);
-    const handler = (e: MediaQueryListEvent) => setIsLg(e.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
-  }, []);
+  const reducedMotion = useReducedMotion();
+  const isLg = useMediaQuery("(min-width: 1024px)");
 
   const itemHeight = isLg ? ITEM_HEIGHT_LG : ITEM_HEIGHT_SM;
 
@@ -168,10 +207,13 @@ export function FeatureCarousel() {
   };
 
   useEffect(() => {
-    if (isPaused) return;
+    // Motion that starts on its own and never stops is exactly what a reduced
+    // motion request is about (WCAG 2.2.2), and the chips still let anyone move
+    // through the list by hand.
+    if (isPaused || reducedMotion) return;
     const interval = setInterval(nextStep, AUTO_PLAY_INTERVAL);
     return () => clearInterval(interval);
-  }, [nextStep, isPaused]);
+  }, [nextStep, isPaused, reducedMotion]);
 
   const getCardStatus = (index: number) => {
     const diff = index - currentIndex;
@@ -315,7 +357,7 @@ export function FeatureCarousel() {
                         />
                       </div>
                       <span className="text-white/20 text-xs md:text-sm font-mono tracking-widest">
-                        0{index + 1}
+                        {String(index + 1).padStart(2, "0")}
                       </span>
                     </div>
 

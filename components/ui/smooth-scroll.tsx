@@ -2,13 +2,7 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/lib/useReducedMotion";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const reducedMotion = useReducedMotion();
@@ -22,20 +16,24 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      touchMultiplier: 2,
+      touchMultiplier: 2
     });
 
-    // Connect Lenis to GSAP ScrollTrigger
-    lenis.on("scroll", ScrollTrigger.update);
-
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-    gsap.ticker.lagSmoothing(0);
+    // Lenis used to be driven by gsap.ticker, which only existed here to keep
+    // ScrollTrigger in sync. Nothing uses ScrollTrigger now, and the teardown
+    // was unsound anyway: it removed `lenis.raf`, never the closure that had
+    // been added, so every unmount left a ticker callback running against a
+    // destroyed instance.
+    let frame = 0;
+    const raf = (time: number) => {
+      lenis.raf(time);
+      frame = requestAnimationFrame(raf);
+    };
+    frame = requestAnimationFrame(raf);
 
     return () => {
+      cancelAnimationFrame(frame);
       lenis.destroy();
-      gsap.ticker.remove(lenis.raf);
     };
   }, [reducedMotion]);
 

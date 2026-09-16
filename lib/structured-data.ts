@@ -87,6 +87,63 @@ export function buildProjectGraph(project: {
 }
 
 /**
+ * `Article` for one post.
+ *
+ * `author` is a Person when the post names one and the organisation otherwise —
+ * an Article with no author at all is the shape that gets ignored, and
+ * attributing a named person who did not write it would be worse.
+ */
+export function buildPostGraph(post: {
+  slug: string;
+  title: string;
+  excerpt?: string;
+  image?: string;
+  publishedAt?: string;
+  authorName?: string;
+}): Record<string, unknown> {
+  const url = `${SITE_URL}/insights/${post.slug}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": `${url}#article`,
+    headline: post.title.slice(0, 110),
+    url,
+    mainEntityOfPage: url,
+    ...(post.excerpt ? { description: post.excerpt } : {}),
+    ...(post.image?.startsWith("http") ? { image: post.image } : {}),
+    ...(post.publishedAt ? { datePublished: post.publishedAt } : {}),
+    author: post.authorName
+      ? { "@type": "Person", name: post.authorName }
+      : { "@id": `${SITE_URL}/#organization` },
+    publisher: { "@id": `${SITE_URL}/#organization` }
+  };
+}
+
+/**
+ * `FAQPage` for the published questions.
+ *
+ * Google shows FAQ rich results only when the marked-up questions and answers
+ * are visible on the page, so this is built from exactly the rows the page
+ * renders — never from a superset. Answers are plain text; anything else would
+ * be an HTML claim the page does not honour.
+ */
+export function buildFaqGraph(
+  faqs: { question: string; answer: string }[]
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${SITE_URL}/faq#faq`,
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer }
+    }))
+  };
+}
+
+/**
  * Serialises a graph for a `<script type="application/ld+json">`.
  *
  * `<` is escaped so a stray "</script>" inside CMS copy cannot close the tag

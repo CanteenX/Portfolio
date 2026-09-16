@@ -23,7 +23,12 @@ export const metadata: Metadata = {
     template: `%s — ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    // Advertised site-wide so a reader can subscribe from any page, which is
+    // how feed discovery in browsers and readers actually works.
+    types: { "application/rss+xml": `${SITE_URL}/insights/rss.xml` }
+  },
   openGraph: {
     title: TITLE,
     description: SITE_DESCRIPTION,
@@ -48,6 +53,16 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} h-full antialiased`}
     >
+      <head>
+        {/*
+          Scroll reveals render with opacity 0 and are animated in by script.
+          Without this, a reader with JavaScript disabled — or one whose bundle
+          failed to load — gets a page of invisible content.
+        */}
+        <noscript>
+          <style>{"[data-reveal]{opacity:1 !important;transform:none !important}"}</style>
+        </noscript>
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         {/*
           Organisation + WebSite graph, emitted once for the whole site. Rendered

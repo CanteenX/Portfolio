@@ -21,7 +21,9 @@ import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { usePublicSettings } from "@/lib/usePublicAPI";
-import { getPublicSettings, submitContact, type PortfolioSettings } from "@/lib/api";
+import { getPublicSettings, submitContact, type ApiService, type PortfolioSettings } from "@/lib/api";
+import { resolvePageCopy } from "@/lib/page-copy";
+import { EmphasisedHeadline } from "@/components/ui/emphasised-headline";
 
 function useLocalTime() {
   const [time, setTime] = useState("");
@@ -81,7 +83,10 @@ function Field({
   );
 }
 
-/** Coarse on purpose: a band is a click, an exact figure is a negotiation. */
+/**
+ * Coarse on purpose: a band is a click, an exact figure is a negotiation.
+ * Overridden by `settings.contactForm.budgetBands` when an editor sets them.
+ */
 const BUDGET_OPTIONS = [
   "Under ₹2L",
   "₹2L – ₹5L",
@@ -96,13 +101,16 @@ const TIMELINE_OPTIONS = [
   "3–6 months",
   "Just exploring"
 ];
+/** Only used if the service catalogue is unreachable — an empty dropdown would
+ *  stop a visitor from telling us what they want. */
 const FALLBACK_SERVICES = [
   "App Development",
   "Website Building",
-  "CRM Panel",
+  "CRM & Admin Panels",
   "SEO",
   "Google & Meta Ads",
   "Tech Consultancy",
+  "Maintenance",
   "UI/UX Design",
   "AI Solutions",
 ];
@@ -115,13 +123,38 @@ const FALLBACK_CALL_SLOTS = [
   "Fri 13 · 10am",
 ];
 
-export default function ContactView({ initialSettings }: { initialSettings: PortfolioSettings | null }) {
+export default function ContactView({
+  initialSettings,
+  initialServices = [],
+}: {
+  initialSettings: PortfolioSettings | null;
+  initialServices?: ApiService[];
+}) {
   const { settings } = usePublicSettings(getPublicSettings, initialSettings);
 
   const email = settings?.contactInfo?.email || FALLBACK_EMAIL;
   const phone = settings?.contactInfo?.phone || FALLBACK_PHONE;
-  const services = settings?.services?.length ? settings.services : FALLBACK_SERVICES;
+  // Sourced from the same catalogue /services renders, so a service the site
+  // advertises is always selectable here. `showInContactForm` lets a service be
+  // advertised without yet accepting enquiries.
+  const services = initialServices.length
+    ? initialServices.filter((s) => s.showInContactForm !== false).map((s) => s.title)
+    : FALLBACK_SERVICES;
   const callSlots = settings?.callSlots?.length ? settings.callSlots : FALLBACK_CALL_SLOTS;
+  // Bands and timelines are stored as free text on the lead, so an editor can
+  // change them without a migration and without invalidating past submissions.
+  const budgetOptions = settings?.contactForm?.budgetBands?.length
+    ? settings.contactForm.budgetBands
+    : BUDGET_OPTIONS;
+  const timelineOptions = settings?.contactForm?.timelines?.length
+    ? settings.contactForm.timelines
+    : TIMELINE_OPTIONS;
+  const copy = resolvePageCopy(settings, "contact", {
+    eyebrow: "Initialize // Let's Talk",
+    title: "Let's build together.",
+    lead:
+      "Pick your preferred route. Whether it's a quick message or a deep-dive discovery call, we respond in under 12 hours."
+  });
 
   // The phone card is dropped entirely when no number is configured, rather
   // than rendering an empty card with a dead tel: link.
@@ -201,7 +234,7 @@ export default function ContactView({ initialSettings }: { initialSettings: Port
 
   return (
     <main className="min-h-screen w-full bg-black text-white selection:bg-mint/30 overflow-x-hidden">
-      <Navbar />
+      <Navbar initialSettings={initialSettings} />
 
       {/* ============ HERO SECTION ============ */}
       <section className="relative pt-36 pb-16 px-6">
@@ -210,16 +243,22 @@ export default function ContactView({ initialSettings }: { initialSettings: Port
             <ScrollReveal direction="up">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border border-mint/20 bg-mint/5 text-xs font-medium text-mint">
                 <MessageSquare size={14} />
-                Initialize // Let's Talk
+                {copy.eyebrow}
               </div>
 
               <h1 className="mb-6">
-                Let's build <span className="text-zinc-500">together.</span>
+                <EmphasisedHeadline
+                  text={copy.title}
+                  word="together."
+                  className="text-zinc-500"
+                />
               </h1>
 
-              <p className="text-lg text-zinc-400 max-w-md mx-auto lg:mx-0 leading-relaxed mb-10">
-                Pick your preferred route. Whether it's a quick message or a deep-dive discovery call, we respond in under 12 hours.
-              </p>
+              {copy.lead && (
+                <p className="text-lg text-zinc-400 max-w-md mx-auto lg:mx-0 leading-relaxed mb-10">
+                  {copy.lead}
+                </p>
+              )}
 
               <div className="space-y-6 max-w-md mx-auto lg:mx-0">
                 {/* Local Time Card */}
@@ -393,7 +432,7 @@ export default function ContactView({ initialSettings }: { initialSettings: Port
                       <div className="mb-10 text-center md:text-left">
                         <h2 className="tracking-tight mb-3">Direct Protocol.</h2>
                         <p className="text-zinc-500">
-                          Brief us on your objectives and we'll engineer the path forward.
+                          Brief us on your objectives and we&rsquo;ll engineer the path forward.
                         </p>
                       </div>
 
@@ -477,7 +516,7 @@ export default function ContactView({ initialSettings }: { initialSettings: Port
                           onChange={(val) =>
                             setFormState((prev) => ({ ...prev, budgetBand: val }))
                           }
-                          options={BUDGET_OPTIONS}
+                          options={budgetOptions}
                           placeholder="Select a range"
                         />
                         <CustomSelect
@@ -486,7 +525,7 @@ export default function ContactView({ initialSettings }: { initialSettings: Port
                           onChange={(val) =>
                             setFormState((prev) => ({ ...prev, timeline: val }))
                           }
-                          options={TIMELINE_OPTIONS}
+                          options={timelineOptions}
                           placeholder="When do you want to start?"
                         />
                       </div>
@@ -578,7 +617,7 @@ export default function ContactView({ initialSettings }: { initialSettings: Port
         </div>
       </section>
 
-      <Footer />
+      <Footer initialSettings={initialSettings} />
     </main>
   );
 }

@@ -1,8 +1,9 @@
 import { cache } from "react";
 import type { Metadata } from "next";
-import { getPublicProjectBySlug, resolveImageUrl } from "@/lib/api";
-import { getProject } from "@/lib/projects";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { notFound } from "next/navigation";
+import { getPublicProjectBySlug, resolveImageUrl, type ApiProject, getPublicSettings } from "@/lib/api";
+import { getProject, toApiProject } from "@/lib/projects";
+import { buildPageMetadata } from "@/lib/seo";
 import { buildProjectGraph, serialiseJsonLd } from "@/lib/structured-data";
 import ProjectDetail from "./project-detail";
 
@@ -17,8 +18,11 @@ type Props = { params: Promise<{ slug: string }> };
  * does not dedupe it for us. Without this the shell would issue two identical
  * upstream requests for every case study render.
  */
-const resolveProject = cache(async (slug: string) => {
-  return (await getPublicProjectBySlug(slug).catch(() => null)) ?? getProject(slug) ?? null;
+const resolveProject = cache(async (slug: string): Promise<ApiProject | null> => {
+  const fromCms = await getPublicProjectBySlug(slug).catch(() => null);
+  if (fromCms) return fromCms;
+  const bundled = getProject(slug);
+  return bundled ? toApiProject(bundled) : null;
 });
 
 /**
@@ -30,44 +34,37 @@ const resolveProject = cache(async (slug: string) => {
  * empty shell to crawlers and link-preview bots. Fetching here, on the server,
  * gives each project a real title, description and OG image without touching
  * the view's rendering.
+ *
+ * Metadata resolves SEO Manager row → project content → site defaults. The row
+ * matters because the three bespoke case studies this route replaced in B-4 had
+ * hand-written titles registered under `/projects/<slug>`; going through
+ * `buildPageMetadata` means those rows keep applying to the same URLs instead
+ * of being silently replaced by generated copy on the site's best-ranking
+ * pages.
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const project = await resolveProject(slug);
 
   if (!project) {
-    return { title: `Project not found — ${SITE_NAME}` };
+    // The root layout's title template appends the site name already.
+    return { title: "Project not found" };
   }
 
-  const title = `${project.title} — ${SITE_NAME}`;
-  // `problem` is the case study's opening paragraph; it reads better as a
-  // search snippet than the one-line metric does.
-  const description = (project.problem || project.solution || "").slice(0, 200);
-  const image = resolveImageUrl(project.image);
-  const url = `${SITE_URL}/projects/${slug}`;
-
-  return {
-    // Absolute: the title already ends in the site name, and the layout's
-    // `%s — Nventra` template would otherwise append it a second time — the
-    // live page was serving "Data Setu — Nventra — Nventra".
-    title: { absolute: title },
-    description,
-    alternates: { canonical: url },
-    openGraph: {
-      title,
-      description,
-      url,
-      type: "article",
-      siteName: SITE_NAME,
-      ...(image ? { images: [{ url: image, alt: project.title }] } : {})
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      ...(image ? { images: [image] } : {})
-    }
-  };
+  return buildPageMetadata({
+    slug: `/projects/${slug}`,
+    // Absolute-ready: the layout template appends the site name, so this is the
+    // bare project title. `buildPageMetadata` handles the suffix.
+    defaultTitle: project.title,
+    // `intro` is the case study's opening paragraph and reads as a search
+    // snippet; `problem` is the next best thing on projects that predate it.
+    defaultDescription: (project.intro || project.problem || project.solution || "").slice(
+      0,
+      200
+    ),
+    defaultImage: resolveImageUrl(project.image) || undefined,
+    ogType: "article"
+  });
 }
 
 /**
@@ -80,28 +77,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  */
 export default async function Page({ params }: Props) {
   const { slug } = await params;
-  const project = await resolveProject(slug);
+  // Settings ride along so the nav and footer render CMS copy in the server
+  // HTML. These are the site's highest-value URLs; a crawler must not read the
+  // shipped fallback nav here.
+  const [project, settings] = await Promise.all([
+    resolveProject(slug),
+    getPublicSettings().catch(() => null)
+  ]);
 
-  const graph = project
-    ? buildProjectGraph({
-        slug,
-        title: project.title,
-        problem: project.problem,
-        solution: project.solution,
-        image: resolveImageUrl(project.image),
-        year: project.year
-      })
-    : null;
+  // A slug with no case study behind it used to render the view's own "Project
+  // Not Found" screen with a 200, which is a soft 404: crawlers index the dead
+  // URL and it competes with the real pages. This returns a real 404 and the
+  // site's not-found page.
+  if (!project) notFound();
+
+  const graph = buildProjectGraph({
+    slug,
+    title: project.title,
+    problem: project.problem,
+    solution: project.solution,
+    image: resolveImageUrl(project.image),
+    year: project.year
+  });
 
   return (
     <>
-      {graph ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: serialiseJsonLd(graph) }}
-        />
-      ) : null}
-      <ProjectDetail />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serialiseJsonLd(graph) }}
+      />
+      <ProjectDetail initialProject={project} initialSettings={settings} />
     </>
   );
 }

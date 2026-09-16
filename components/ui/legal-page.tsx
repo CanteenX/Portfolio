@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { type PortfolioSettings } from "@/lib/api";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 import { hasUnconfirmedDetails } from "@/lib/legal";
@@ -13,20 +14,33 @@ import { hasUnconfirmedDetails } from "@/lib/legal";
 export function LegalPage({
   title,
   lastUpdated,
+  showDraftNotice = true,
+  initialSettings = null,
   children
 }: {
   title: string;
   lastUpdated: string;
+  /**
+   * The draft banner reports on the placeholder values in `lib/legal.ts`, so it
+   * is meaningless for a document published from the CMS — that text was
+   * written and ticked by the owner. Pages rendering CMS copy pass `false`.
+   */
+  showDraftNotice?: boolean;
+  /**
+   * Seeded from the server so the nav and footer carry CMS copy in the HTML a
+   * crawler reads, rather than the shipped fallback swapped in after hydration.
+   */
+  initialSettings?: PortfolioSettings | null;
   children: React.ReactNode;
 }) {
   return (
     <main className="min-h-screen bg-black text-white">
-      <Navbar />
+      <Navbar initialSettings={initialSettings} />
       <div className="mx-auto w-full max-w-3xl px-6 py-24">
         <h1 className="text-4xl font-semibold tracking-tight">{title}</h1>
         <p className="mt-3 text-sm text-zinc-500">Last updated: {lastUpdated}</p>
 
-        {hasUnconfirmedDetails() ? (
+        {showDraftNotice && hasUnconfirmedDetails() ? (
           <div
             role="note"
             className="mt-8 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-200"
@@ -48,7 +62,7 @@ export function LegalPage({
           with any question about this document.
         </p>
       </div>
-      <Footer />
+      <Footer initialSettings={initialSettings} />
     </main>
   );
 }

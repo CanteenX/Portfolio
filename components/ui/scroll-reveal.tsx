@@ -1,14 +1,21 @@
 "use client";
 
-import { useEffect, useRef, ReactNode } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useReducedMotion } from "@/lib/useReducedMotion";
+import { ReactNode } from "react";
+import { motion } from "motion/react";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
+/**
+ * Reveals its children as they scroll into view.
+ *
+ * Built on Framer Motion rather than GSAP ScrollTrigger so the site ships one
+ * animation runtime instead of two. ScrollTrigger also needed a scroll-position
+ * feed from Lenis to stay in sync, which is why the smooth-scroll wrapper had to
+ * know about GSAP at all; an IntersectionObserver observes the real scroll
+ * container and needs no such wiring.
+ *
+ * Reduced motion is handled by `MotionConfig reducedMotion="user"` in
+ * app/template.tsx: the transform is dropped and the opacity fade is kept, so
+ * the content still appears instead of staying at opacity 0.
+ */
 interface ScrollRevealProps {
   children: ReactNode;
   className?: string;
@@ -17,80 +24,35 @@ interface ScrollRevealProps {
   duration?: number;
 }
 
+const OFFSET: Record<NonNullable<ScrollRevealProps["direction"]>, { x?: number; y?: number }> = {
+  up: { y: 60 },
+  down: { y: -60 },
+  left: { x: 60 },
+  right: { x: -60 },
+  none: {}
+};
+
 export function ScrollReveal({
   children,
   className = "",
   delay = 0,
   direction = "up",
-  duration = 1,
+  duration = 1
 }: ScrollRevealProps) {
-  const elementRef = useRef<HTMLDivElement>(null);
-  const reducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    const element = elementRef.current;
-    if (!element) return;
-
-    // Content must still be VISIBLE — the animation starts from opacity 0, so
-    // simply skipping it would leave the whole page blank for these users.
-    if (reducedMotion) {
-      gsap.set(element, { opacity: 1, x: 0, y: 0 });
-      return;
-    }
-
-    // Initial state based on direction
-    const initialState: any = {
-      opacity: 0,
-    };
-
-    switch (direction) {
-      case "up":
-        initialState.y = 60;
-        break;
-      case "down":
-        initialState.y = -60;
-        break;
-      case "left":
-        initialState.x = 60;
-        break;
-      case "right":
-        initialState.x = -60;
-        break;
-      case "none":
-        // Only opacity animation
-        break;
-    }
-
-    gsap.set(element, initialState);
-
-    const animation = gsap.to(element, {
-      scrollTrigger: {
-        trigger: element,
-        start: "top 85%",
-        end: "top 20%",
-        toggleActions: "play none none reverse",
-      },
-      opacity: 1,
-      x: 0,
-      y: 0,
-      duration,
-      delay,
-      ease: "power3.out",
-    });
-
-    return () => {
-      animation.kill();
-      ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.vars.trigger === element) {
-          trigger.kill();
-        }
-      });
-    };
-  }, [delay, direction, duration, reducedMotion]);
-
   return (
-    <div ref={elementRef} className={className}>
+    <motion.div
+      className={className}
+      // Server-rendered at opacity 0, so without JS the page would be blank.
+      // The noscript rule in app/layout.tsx targets this attribute.
+      data-reveal=""
+      initial={{ opacity: 0, ...OFFSET[direction] }}
+      whileInView={{ opacity: 1, x: 0, y: 0 }}
+      // Matches the old "top 85%" trigger: the reveal fires once the element is
+      // 15% of the viewport in, not the instant its first pixel crosses.
+      viewport={{ once: true, margin: "0px 0px -15% 0px" }}
+      transition={{ duration, delay, ease: [0.16, 1, 0.3, 1] }}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }

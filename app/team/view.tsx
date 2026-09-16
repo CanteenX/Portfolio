@@ -9,6 +9,7 @@ import { usePublicAPI, usePublicSettings } from "@/lib/usePublicAPI";
 import { getPublicTeam, getPublicSettings, resolveImageUrl, type ApiMember, type PortfolioSettings } from "@/lib/api";
 import { FaLinkedin, FaGithub } from "react-icons/fa";
 import { ArrowUpRight } from "lucide-react";
+import { resolvePageCopy } from "@/lib/page-copy";
 
 const FALLBACK_PLAYBOOK = [
   { phase: "01", name: "Discovery", body: "1-week deep dive: scope, success metrics, architecture sketch." },
@@ -27,25 +28,46 @@ export default function TeamView({
   const { data: team } = usePublicAPI(getPublicTeam, TEAM, initialTeam);
   const { settings } = usePublicSettings(getPublicSettings, initialSettings);
   const playbook = settings?.teamPlaybook?.length ? settings.teamPlaybook : FALLBACK_PLAYBOOK;
+  const copy = resolvePageCopy(settings, "team", {
+    eyebrow: "/team — The Collective",
+    title: "Meet our team.",
+    lead:
+      "The engineers, designers and strategists behind every line of code and pixel-perfect interface."
+  });
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-mint/30">
-      <Navbar />
+      <Navbar initialSettings={initialSettings} />
 
       <div className="pt-28 pb-16 px-6">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
-              <div className="text-mono-tag text-mint mb-4">/team — The Collective</div>
+              <div className="text-mono-tag text-mint mb-4">{copy.eyebrow}</div>
               <h1 className="mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                Meet our team.
+                {copy.title}
               </h1>
-              <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-                The engineers, designers and strategists behind every line of code and pixel-perfect interface.
-              </p>
+              {copy.lead && (
+                <p className="text-gray-400 max-w-2xl mx-auto text-lg">{copy.lead}</p>
+              )}
             </div>
           </ScrollReveal>
+
+          {/* No invented placeholder people: the section states its own state
+              rather than filling itself with plausible strangers. */}
+          {team.length === 0 && (
+            <div className="mb-24 border border-white/10 rounded-3xl py-20 px-6 text-center">
+              <p className="text-gray-400 text-lg">Team profiles are being published.</p>
+              <p className="text-gray-600 text-sm mt-3">
+                In the meantime,{" "}
+                <a href="/contact" className="text-mint underline underline-offset-4">
+                  talk to us directly
+                </a>
+                .
+              </p>
+            </div>
+          )}
 
           {/* Team Grid — photo cards with glass overlay */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
@@ -156,8 +178,8 @@ export default function TeamView({
         </div>
       </div>
 
-      <ContactCTA />
-      <Footer />
+      <ContactCTA initialSettings={initialSettings} />
+      <Footer initialSettings={initialSettings} />
     </main>
   );
 }

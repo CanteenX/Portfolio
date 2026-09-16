@@ -8,16 +8,31 @@ import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactCTA } from "@/components/ui/contact-cta";
 import Link from "next/link";
-import { getPublicProjectsByParams, getPublicCategories, resolveImageUrl } from "@/lib/api";
-import type { ApiProject } from "@/lib/api";
+import {
+  getPublicProjectsByParams,
+  getPublicCategories,
+  getPublicSettings,
+  resolveImageUrl,
+} from "@/lib/api";
+import type { ApiProject, PortfolioSettings } from "@/lib/api";
+import { usePublicSettings } from "@/lib/usePublicAPI";
+import { resolvePageCopy } from "@/lib/page-copy";
+import { EmphasisedHeadline } from "@/components/ui/emphasised-headline";
 
 export default function WorkView({
   initialProjects,
   initialCategories,
+  initialSettings = null,
 }: {
   initialProjects: ApiProject[] | null;
   initialCategories: string[] | null;
+  initialSettings?: PortfolioSettings | null;
 }) {
+  const { settings } = usePublicSettings(getPublicSettings, initialSettings);
+  const copy = resolvePageCopy(settings, "work", {
+    eyebrow: "/work — Selected Engagements",
+    title: "Engineering that solves business problems."
+  });
   const [filter, setFilter] = useState("All");
   const [categories, setCategories] = useState<string[]>(initialCategories ?? []);
   const [projects, setProjects] = useState<ApiProject[]>(initialProjects ?? (PROJECTS as unknown as ApiProject[]));
@@ -30,7 +45,6 @@ export default function WorkView({
   }, []);
 
   useEffect(() => {
-    setLoading(true);
     getPublicProjectsByParams({
       category: filter === "All" ? undefined : filter,
       limit: 100
@@ -53,16 +67,25 @@ export default function WorkView({
   return (
     <SmoothScroll>
       <main className="min-h-screen bg-black text-white">
-        <Navbar />
+        <Navbar initialSettings={initialSettings} />
 
         <div className="pt-36 pb-20 px-6 max-w-7xl mx-auto">
           <ScrollReveal direction="up">
             <div className="font-mono text-xs uppercase tracking-widest text-white mb-6">
-              /work — Selected Engagements
+              {copy.eyebrow}
             </div>
+            {/*
+              The emphasis on "business" is applied by matching the word rather
+              than by splitting the headline into three hardcoded pieces, so an
+              editor can rewrite the sentence — or drop the word — without the
+              markup falling apart.
+            */}
             <h1 className="text-5xl md:text-8xl font-bold tracking-tighter mb-12 max-w-4xl leading-[0.9]">
-              Engineering that solves <span className="text-zinc-600 italic">business</span> problems.
+              <EmphasisedHeadline text={copy.title} word="business" />
             </h1>
+            {copy.lead && (
+              <p className="text-zinc-400 text-lg max-w-2xl -mt-6 mb-12">{copy.lead}</p>
+            )}
           </ScrollReveal>
 
           {/* Filters */}
@@ -71,7 +94,14 @@ export default function WorkView({
               {allFilters.map((f) => (
                 <button
                   key={f}
-                  onClick={() => setFilter(f)}
+                  onClick={() => {
+                    if (f === filter) return;
+                    // Flagged here rather than in the fetch effect: the first
+                    // render already has the server's projects, so a spinner on
+                    // mount would cover content that is present.
+                    setLoading(true);
+                    setFilter(f);
+                  }}
                   className={`px-6 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all ${
                     filter === f
                       ? "bg-white text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)]"
@@ -90,8 +120,24 @@ export default function WorkView({
             </div>
           )}
 
+          {!loading && projects.length === 0 && (
+            <div className="border border-white/5 rounded-3xl py-20 px-6 text-center">
+              <p className="text-zinc-400 text-lg">
+                {filter === "All"
+                  ? "Case studies are being published."
+                  : `No ${filter} engagements published yet.`}
+              </p>
+              <p className="text-zinc-600 text-sm mt-3">
+                <Link href="/contact" className="text-mint underline underline-offset-4">
+                  Ask us about relevant work
+                </Link>
+                .
+              </p>
+            </div>
+          )}
+
           {/* Projects Grid */}
-          {!loading && (
+          {!loading && projects.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5 border border-white/5 overflow-hidden rounded-3xl">
               {projects.map((p, idx) => (
                 <ScrollReveal key={p.slug} delay={idx * 0.05} direction="up">
@@ -134,8 +180,8 @@ export default function WorkView({
           )}
         </div>
 
-        <ContactCTA />
-        <Footer />
+        <ContactCTA initialSettings={initialSettings} />
+        <Footer initialSettings={initialSettings} />
       </main>
     </SmoothScroll>
   );

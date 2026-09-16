@@ -46,7 +46,13 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           alt={project.title}
           className="absolute inset-0 w-full h-full object-cover transition-all duration-700 opacity-40 group-hover:opacity-60 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+        {/*
+          Darkest at the top, where the copy sits. The gradient used to run the
+          other way, which read fine over a dark photograph and left the text
+          barely legible over a bright one — and the image is editor-supplied,
+          so its brightness is not something this card can assume.
+        */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/70" />
         {/* Cursor spotlight */}
         <div
           className="absolute inset-0 pointer-events-none transition-opacity duration-300"

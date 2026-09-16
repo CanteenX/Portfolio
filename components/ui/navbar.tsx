@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePublicSettings } from "@/lib/usePublicAPI";
-import { getPublicSettings } from "@/lib/api";
+import { getPublicSettings, type PortfolioSettings } from "@/lib/api";
 
 const FALLBACK_BRAND = "NVENTRA";
 const FALLBACK_LINKS = [
@@ -16,9 +16,15 @@ const FALLBACK_LINKS = [
 ];
 const FALLBACK_CTA = { label: "Let's Talk", href: "/contact" };
 
-export function Navbar() {
+/**
+ * `initialSettings` is what the page's server component already fetched.
+ * Without it the nav renders FALLBACK_BRAND on the server and swaps to the CMS
+ * brand after hydration — a visible flash on every route, and the wrong name in
+ * the HTML a crawler reads.
+ */
+export function Navbar({ initialSettings }: { initialSettings?: PortfolioSettings | null }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { settings } = usePublicSettings(getPublicSettings);
+  const { settings } = usePublicSettings(getPublicSettings, initialSettings);
 
   const brandName = settings?.navbar?.brandName || FALLBACK_BRAND;
   const navLinks = settings?.navbar?.links?.length ? settings.navbar.links.slice(0, -1) : FALLBACK_LINKS;
@@ -33,9 +39,9 @@ export function Navbar() {
         <div className="flex items-center justify-between">
 
           {/* Logo */}
-          <a href="/" className="font-mono font-medium tracking-tighter text-base text-white">
+          <Link href="/" className="font-mono font-medium tracking-tighter text-base text-white">
             {brandName}
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
