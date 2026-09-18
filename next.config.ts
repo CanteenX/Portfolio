@@ -47,7 +47,11 @@ const nextConfig: NextConfig = {
    */
   async redirects() {
     return [
-      { source: "/projects", destination: "/work", permanent: true }
+      { source: "/projects", destination: "/work", permanent: true },
+      // Deep Mehta's profile was created by editing a placeholder member, so it
+      // shipped at the placeholder's slug. Kept so links already shared or
+      // indexed under the old address still reach the right person.
+      { source: "/team/priya-raman", destination: "/team/deep-mehta", permanent: true }
     ];
   },
 
